@@ -7,7 +7,7 @@ ID [a-zA-Z][a-zA-Z0-9]*
 
 %%
 
-"/*""*/" ;
+"/*"([^*]|\*+[^*/])*\*+"/";
 
 "DECLARE" {fprintf(stderr, "LEX: KEY: DECLARE\n");}
 "PREDICATE" {fprintf(stderr, "LEX: KEY: PREDICATE\n");}
