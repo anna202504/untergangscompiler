@@ -34,9 +34,13 @@ extern FILE *yyin;
 %%
 
 input:
-    declarations formula SEMICOLON
+    input block | block
     ;
 
+block:
+    declarations formula SEMICOLON
+    ;
+    
 declarations:
     declarations declaration | declaration
     ;

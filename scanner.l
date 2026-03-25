@@ -10,7 +10,7 @@ ID [a-zA-Z][a-zA-Z0-9]*
 
 %%
 
-"/*"(.|\n)*?"*/" ;  
+"/*"(.|\n)*?"*/" {fprintf(stderr, "LEX: COMMENT: %s\n", yytext);}  
 [ \t\r\n]+ ; 
 
 "DECLARE" {fprintf(stderr, "LEX: KEY: DECLARE\n"); return DECLARE;}
@@ -24,8 +24,8 @@ ID [a-zA-Z][a-zA-Z0-9]*
 "TRUE" {fprintf(stderr, "LEX: CONST: TRUE\n"); return TRUE;}
 "FALSE" {fprintf(stderr, "LEX: CONST: FALSE\n"); return FALSE;}
 
-"->" { fprintf(stderr, "LEX: OPERATOR: IMPLIES\n"); return IMPLIES;}
 "<->" { fprintf(stderr, "LEX: OPERATOR: EQUIV\n"); return EQUIV;}
+"->" { fprintf(stderr, "LEX: OPERATOR: IMPLIES\n"); return IMPLIES;}
 "&" { fprintf(stderr, "LEX: OPERATOR: AND\n"); return AND;}
 "|" { fprintf(stderr, "LEX: OPERATOR: OR\n"); return OR;}
 "~" { fprintf(stderr, "LEX: OPERATOR: NOT\n"); return NOT;}

@@ -365,9 +365,9 @@ static const flex_int16_t yy_accept[81] =
     {   0,
         0,    0,   27,   25,    2,    2,   13,   16,   17,   20,
        25,   25,   23,   21,   22,   25,   24,   24,   24,   24,
-       24,   24,   24,   24,   18,   19,   14,   15,    2,   11,
+       24,   24,   24,   24,   18,   19,   14,   15,    2,   12,
         0,   23,    0,   24,   24,   24,   24,   24,   24,   24,
-       24,   24,    0,    0,   12,    8,   24,   24,   24,   24,
+       24,   24,    0,    0,   11,    8,   24,   24,   24,   24,
        24,   24,   24,    1,   24,   24,   24,   24,   24,    9,
        24,   24,    7,   10,   24,   24,   24,   24,   24,   24,
        24,    3,   24,   24,   24,    5,   24,    6,    4,    0
@@ -779,7 +779,7 @@ case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
 #line 13 "scanner.l"
-;  
+{fprintf(stderr, "LEX: COMMENT: %s\n", yytext);}  
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
@@ -830,12 +830,12 @@ YY_RULE_SETUP
 case 11:
 YY_RULE_SETUP
 #line 27 "scanner.l"
-{ fprintf(stderr, "LEX: OPERATOR: IMPLIES\n"); return IMPLIES;}
+{ fprintf(stderr, "LEX: OPERATOR: EQUIV\n"); return EQUIV;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 28 "scanner.l"
-{ fprintf(stderr, "LEX: OPERATOR: EQUIV\n"); return EQUIV;}
+{ fprintf(stderr, "LEX: OPERATOR: IMPLIES\n"); return IMPLIES;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
