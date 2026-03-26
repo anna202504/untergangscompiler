@@ -1,7 +1,10 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "symboltable.c"
+#include "symboltable.h"
+#include <string.h>
+
+struct tableEntry *symbolTable = NULL;
 
 int yylex(void);
 void yyerror (const char *s);
@@ -62,12 +65,12 @@ declaration:
             free($3);
         }
         | DECLARE VARIABLE STRING COLON STRING {
-            fprintf(stderr, "PAR: Declaration: Variable -%s- Arity: %d\n", $3, $5);
-            if (getSymbolEntry(& $3, $5, 0)) {
+            fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", $3, $5);
+            if (getSymbolEntry(symbolTable, $3)) {
                 yyerror("Variable already declared");
             }
             else {
-                addSymbolEntry($3, $5, 0);
+                addSymbolEntry(&symbolTable, $3, $5, 0);
             }
             free($3); free($5);
         }

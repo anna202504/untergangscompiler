@@ -71,13 +71,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "symboltable.c"
+#include "symboltable.h"
+#include <string.h>
+
+struct tableEntry *symbolTable = NULL;
 
 int yylex(void);
 void yyerror (const char *s);
 extern FILE *yyin; 
 
-#line 81 "parser.c"
+#line 84 "parser.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -535,10 +538,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    45,    45,    49,    49,    55,    60,    64,    75,    79,
-      80,    84,    85,    89,    90,    94,    95,    99,   100,   104,
-     105,   106,   107,   111,   115,   119,   126,   127,   131,   131,
-     135,   139,   142
+       0,    48,    48,    52,    52,    58,    63,    67,    81,    85,
+      86,    90,    91,    95,    96,   100,   101,   105,   106,   110,
+     111,   112,   113,   117,   121,   125,   132,   133,   137,   137,
+     141,   145,   148
 };
 #endif
 
@@ -1139,139 +1142,142 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* input: declarations formula SEMICOLON  */
-#line 45 "parser.y"
+#line 48 "parser.y"
                                    {fprintf(stderr, "PAR: SEMICOLON\n");}
-#line 1145 "parser.c"
+#line 1148 "parser.c"
     break;
 
   case 5: /* declaration: DECLARE PREDICATE STRING COLON INT  */
-#line 55 "parser.y"
+#line 58 "parser.y"
                                            {
             fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", (yyvsp[-2].str), (yyvsp[0].val));
             free((yyvsp[-2].str));
 
         }
-#line 1155 "parser.c"
+#line 1158 "parser.c"
     break;
 
   case 6: /* declaration: DECLARE FUNCTION STRING COLON INT  */
-#line 60 "parser.y"
+#line 63 "parser.y"
                                             {
             fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", (yyvsp[-2].str), (yyvsp[0].val));
             free((yyvsp[-2].str));
         }
-#line 1164 "parser.c"
+#line 1167 "parser.c"
     break;
 
   case 7: /* declaration: DECLARE VARIABLE STRING COLON STRING  */
-#line 64 "parser.y"
+#line 67 "parser.y"
                                                {
-            fprintf(stderr, "PAR: Declaration: Variable -%s- Arity: %d\n", (yyvsp[-2].str), (yyvsp[0].str));
-            if (!addSymbolEntry((yyvsp[-2].str), (yyvsp[0].str), -1)) {
+            fprintf(stderr, "PAR: Declaration: Variable -%s- Arity: %s\n", (yyvsp[-2].str), (yyvsp[0].str));
+            if (getSymbolEntry(symbolTable, (yyvsp[-2].str))) {
                 yyerror("Variable already declared");
+            }
+            else {
+                addSymbolEntry(&symbolTable, (yyvsp[-2].str), (yyvsp[0].str), 0);
             }
             free((yyvsp[-2].str)); free((yyvsp[0].str));
         }
-#line 1176 "parser.c"
-    break;
-
-  case 10: /* equiv_formula: equiv_formula EQUIV implies_formula  */
-#line 80 "parser.y"
-                                          { fprintf(stderr,"PAR: JUNCTOR: EQUIV\n"); }
 #line 1182 "parser.c"
     break;
 
-  case 12: /* implies_formula: implies_formula IMPLIES or_formula  */
-#line 85 "parser.y"
-                                         { fprintf(stderr,"PAR: JUNCTOR: IMPLICATION\n"); }
+  case 10: /* equiv_formula: equiv_formula EQUIV implies_formula  */
+#line 86 "parser.y"
+                                          { fprintf(stderr,"PAR: JUNCTOR: EQUIV\n"); }
 #line 1188 "parser.c"
     break;
 
-  case 14: /* or_formula: or_formula OR and_formula  */
-#line 90 "parser.y"
-                                { fprintf(stderr,"PAR: JUNCTOR: OR\n"); }
+  case 12: /* implies_formula: implies_formula IMPLIES or_formula  */
+#line 91 "parser.y"
+                                         { fprintf(stderr,"PAR: JUNCTOR: IMPLICATION\n"); }
 #line 1194 "parser.c"
     break;
 
-  case 16: /* and_formula: and_formula AND not_formula  */
-#line 95 "parser.y"
-                                  { fprintf(stderr,"PAR: JUNCTOR: AND\n"); }
+  case 14: /* or_formula: or_formula OR and_formula  */
+#line 96 "parser.y"
+                                { fprintf(stderr,"PAR: JUNCTOR: OR\n"); }
 #line 1200 "parser.c"
     break;
 
-  case 18: /* not_formula: NOT not_formula  */
-#line 100 "parser.y"
-                      { fprintf(stderr,"PAR: JUNCTOR: NOT\n"); }
+  case 16: /* and_formula: and_formula AND not_formula  */
+#line 101 "parser.y"
+                                  { fprintf(stderr,"PAR: JUNCTOR: AND\n"); }
 #line 1206 "parser.c"
     break;
 
-  case 19: /* quant_or_atom: TRUE  */
-#line 104 "parser.y"
-           { fprintf(stderr,"PAR: CONST: TRUE\n"); }
+  case 18: /* not_formula: NOT not_formula  */
+#line 106 "parser.y"
+                      { fprintf(stderr,"PAR: JUNCTOR: NOT\n"); }
 #line 1212 "parser.c"
     break;
 
-  case 20: /* quant_or_atom: FALSE  */
-#line 105 "parser.y"
-            { fprintf(stderr,"PAR: CONST: FALSE\n"); }
+  case 19: /* quant_or_atom: TRUE  */
+#line 110 "parser.y"
+           { fprintf(stderr,"PAR: CONST: TRUE\n"); }
 #line 1218 "parser.c"
     break;
 
+  case 20: /* quant_or_atom: FALSE  */
+#line 111 "parser.y"
+            { fprintf(stderr,"PAR: CONST: FALSE\n"); }
+#line 1224 "parser.c"
+    break;
+
   case 22: /* quant_or_atom: ALL SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula  */
-#line 107 "parser.y"
+#line 113 "parser.y"
                                                                       {
         fprintf(stderr,"PAR: QUANTOR: ALL %s\n",(yyvsp[-2].str)); 
         free((yyvsp[-2].str)); 
         }
-#line 1227 "parser.c"
+#line 1233 "parser.c"
     break;
 
   case 23: /* quant_or_atom: EXIST SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula  */
-#line 111 "parser.y"
+#line 117 "parser.y"
                                                                         {
         fprintf(stderr,"PAR: QUANTOR: EXIST %s\n",(yyvsp[-2].str)); 
         free((yyvsp[-2].str)); 
         }
-#line 1236 "parser.c"
+#line 1242 "parser.c"
     break;
 
   case 25: /* atom: STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE  */
-#line 119 "parser.y"
+#line 125 "parser.y"
                                                     {
         fprintf(stderr, "PAR: ATOM: %s()\n", (yyvsp[-3].str));
         free((yyvsp[-3].str));
     }
-#line 1245 "parser.c"
+#line 1251 "parser.c"
     break;
 
   case 30: /* term: STRING  */
-#line 135 "parser.y"
+#line 141 "parser.y"
            {
         fprintf(stderr, "PAR: TERM: Variable/Constant %s\n", (yyvsp[0].str));
         free((yyvsp[0].str));
     }
-#line 1254 "parser.c"
+#line 1260 "parser.c"
     break;
 
   case 31: /* term: INT  */
-#line 139 "parser.y"
+#line 145 "parser.y"
         {
         fprintf(stderr, "PAR: TERM: Constant %d\n", (yyvsp[0].val));
     }
-#line 1262 "parser.c"
+#line 1268 "parser.c"
     break;
 
   case 32: /* term: STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE  */
-#line 142 "parser.y"
+#line 148 "parser.y"
                                                     {
         fprintf(stderr, "PAR: TERM: Function %s(...)\n", (yyvsp[-3].str));
         free((yyvsp[-3].str));
       }
-#line 1271 "parser.c"
+#line 1277 "parser.c"
     break;
 
 
-#line 1275 "parser.c"
+#line 1281 "parser.c"
 
       default: break;
     }
@@ -1464,7 +1470,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 154 "parser.y"
+#line 160 "parser.y"
 
 
 void yyerror(const char *s){

@@ -1,12 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "symboltable.h"
 
-struct tableEntry {
-    char *identifier; 
-    char *type; // e.g., "int", "float", "function"
-    int arity; // number of parameters for functions, 0 for variables
-    struct tableEntry *next; 
-};
+
 
 void addSymbolEntry(struct tableEntry **head, const char *identifier, const char *type, int arity) {
     struct tableEntry *newEntry = (struct tableEntry *)malloc(sizeof(struct tableEntry));
@@ -17,7 +14,7 @@ void addSymbolEntry(struct tableEntry **head, const char *identifier, const char
     *head = newEntry; 
 }
 
-getSymbolEntry(struct tableEntry *head, const char *identifier){
+struct tableEntry *getSymbolEntry(struct tableEntry *head, const char *identifier){
     struct tableEntry *current = head;
     while (current != NULL) {
         if (strcmp(current->identifier, identifier) == 0) {
@@ -26,5 +23,4 @@ getSymbolEntry(struct tableEntry *head, const char *identifier){
         current = current->next; 
     }
     return NULL;
-
 }
