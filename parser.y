@@ -1,6 +1,10 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "symbol_table.h"
+
+struct tableEntry *symbolTable = NULL;
 
 int yylex(void);
 void yyerror(const char *s);
@@ -48,14 +52,36 @@ declarations:
 declaration:
     DECLARE PREDICATE STRING COLON INT {
         fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", $3, $5);
+        if (getSymbolEntry(symbolTable, $3) != NULL) {
+            fprintf(stderr, "ERROR: Predicate %s already declared\n", $3);
+            exit(1);
+        }
+        else {
+            addSymbolEntry(&symbolTable, $3, "predicate", $5);
+        }
         free($3);
     }
     | DECLARE FUNCTION STRING COLON INT {
         fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", $3, $5);
+        if (getSymbolEntry(symbolTable, $3) != NULL) {
+            fprintf(stderr, "ERROR: FUnction already declared\n");
+            exit(1);
+        }
+        else {
+            addSymbolEntry(&symbolTable, $3, "function", $5);
+        }
         free($3);
     }
     | DECLARE VARIABLE STRING COLON STRING {
         fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", $3, $5);
+        if (getSymbolEntry(symbolTable, $3) != NULL) {
+            fprintf(stderr, "ERROR: Variable already declared\n");
+            exit(1);
+        }
+        else {
+            addSymbolEntry(&symbolTable, $3, "variable", 0);
+        }
+
         free($3);
         free($5);
     }
@@ -94,8 +120,24 @@ quant_or_atom:
       TRUE { fprintf(stderr,"PAR: CONST: TRUE\n"); }
     | FALSE { fprintf(stderr,"PAR: CONST: FALSE\n"); }
     | atom
-    | ALL SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula {
-        fprintf(stderr,"PAR: QUANTOR: ALL %s\n",$3); free($3); }
+    | ALL SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula 
+{
+    struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
+
+    if (entry == NULL) {
+        fprintf(stderr, "ERROR: Variable %s not declared\n", $3);
+        exit(1);
+    }
+
+    if (strcmp(entry->type, "variable") != 0) {
+        fprintf(stderr, "ERROR: %s is not a variable\n", $3);
+        exit(1);
+    }
+
+    fprintf(stderr, "PAR: QUANTOR: ALL %s\n", $3);
+    free($3);
+}
+
     | EXIST SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula {
         fprintf(stderr,"PAR: QUANTOR: EXIST %s\n",$3); free($3); }
     | BRACKET_OPEN formula BRACKET_CLOSE
@@ -103,6 +145,16 @@ quant_or_atom:
 
 atom:
     STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE {
+        struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
+
+        if(entry == NULL) {
+            fprintf(stderr, "ERROR: %s not declared\n", $1);
+            exit(1);
+        }
+        if(strcmp(entry->type, "predicate") != 0) {
+            fprintf(stderr, "ERROR: %s is not a predicate\n", $1);
+            exit(1);
+        }
         fprintf(stderr, "PAR: ATOM: %s()\n", $1);
         free($1);
     }
@@ -119,6 +171,16 @@ term_list:
 
 term:
     STRING {
+        struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
+        if(entry == NULL) {
+            fprintf(stderr, "ERROR: %s not declared\n", $1);
+            exit(1);
+        }
+        if(strcmp(entry->type, "variable") != 0 &&
+        strcmp(entry->type, "function") != 0) {
+            fprintf(stderr, "ERROR: %s is not a valid term\n", $1);
+            exit(1);
+        }
         fprintf(stderr, "PAR: TERM: Variable/Constant %s\n", $1);
         free($1);
     }
@@ -126,6 +188,16 @@ term:
         fprintf(stderr, "PAR: TERM: Constant %d\n", $1);
     }
   | STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE {
+    struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
+
+    if(entry == NULL) {
+        fprintf(stderr, "ERROR: %s not declared\n", $1);
+        exit(1);
+    }
+    if(strcmp(entry->type, "function") != 0) {
+        fprintf(stderr, "ERROR: %s is not a function\n", $1);
+        exit(1);
+    }
         fprintf(stderr, "PAR: TERM: Function %s(...)\n", $1);
         free($1);
       }

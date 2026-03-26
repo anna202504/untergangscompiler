@@ -1,13 +1,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
-
-typedef struct tableEntry {
-    char *identifier;
-    char *type;
-    int arity;
-    struct tableEntry *next;
-};
+# include "symbol_table.h"
 
 void addSymbolEntry(struct tableEntry **head, char *identifier, char *type, int arity) {
     struct tableEntry *newEntry = (struct tableEntry *)malloc(sizeof(struct tableEntry));

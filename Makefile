@@ -7,7 +7,7 @@
 #*                                            *
 #**********************************************
 
-objects = parser.o scanner.o #error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
+objects = parser.o scanner.o symbol_table.o #error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
 CC	= gcc
 LEX	= flex
 YACC	= bison
@@ -24,7 +24,6 @@ parser.c:	parser.y
 scanner.c:	scanner.l 
 	$(LEX) -t $< > $@
 
-
 #error.o:	debug.h error.h
 #debug.o:	debug.h error.h
 #scanner.o:	debug.h error.h parser.h
@@ -34,10 +33,11 @@ scanner.o: parser.h
 #optimize.o:	debug.h error.h optimize.h syntaxtree.h symboltable.h
 #generate.o:	debug.h error.h generate.h syntaxtree.h symboltable.h
 #parser.o:	debug.h error.h parser.h process.h symboltable.h syntaxtree.h 
-parser.o:	parser.h
+parser.o:	parser.h symbol_table.h
 #process.o:	debug.h error.h process.h optimize.h generate.h syntaxtree.h symboltable.h
 #main.o:		debug.h error.h parser.h generate.h process.h syntaxtree.h symboltable.h
 #parser.h:	parser.y
+
 
 clean:
 	rm pl1c parser.c scanner.c parser.h $(objects)
