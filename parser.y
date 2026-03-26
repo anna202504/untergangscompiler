@@ -38,7 +38,7 @@ input:
     ;
 
 block:
-    declarations formula SEMICOLON
+    declarations formula SEMICOLON {fprintf(stderr, "PAR: SEMICOLON\n");}
     ;
     
 declarations:
