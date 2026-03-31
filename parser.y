@@ -221,5 +221,9 @@ int main(int argc, char *argv[]){
     }
     yyin = fp;
 
-    return yyparse();
+    int result = yyparse();
+
+    printSymbolTable(symbolTable);
+
+    return result;
 } 
