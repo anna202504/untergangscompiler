@@ -1,6 +1,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "symboltable.h"
+
+struct tableEntry *symbolTable = NULL; 
 
 int yylex(void);
 void yyerror (const char *s);
@@ -40,7 +43,12 @@ extern FILE *yyin;
 
 /* Grammatik-Regeln*/
 
-input:
+input: 
+    input block | block
+    ; 
+
+
+block:
     declarations formula SEMICOLON {fprintf(stderr, "PAR: SEMICOLON\n");}
     ;
 
@@ -53,15 +61,31 @@ declaration:
 
         DECLARE PREDICATE STRING COLON INT {
             fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", $3, $5);
+            if(getSymbolEntry(symbolTable, $3)){
+                yyerror("Predicate already declared"); 
+            }
+            else {
+                addSymbolEntry(&symbolTable, $3, "predicate", $5);
+            }
             free($3);
-
         }
         | DECLARE FUNCTION STRING COLON INT {
-            fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", $3, $5);
-            free($3);
+            fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", $3, $5);            if(getSymbolEntry(symbolTable, $3)){
+                yyerror("Function already declared"); 
+            }
+            else {
+                addSymbolEntry(&symbolTable, $3, "function", $5);
+            }            free($3);
         }
         | DECLARE VARIABLE STRING COLON STRING {
             fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", $3, $5);
+            if(getSymbolEntry(symbolTable, $3)){
+                yyerror("Variable already declared"); 
+            }
+            else {
+                addSymbolEntry(&symbolTable, $3, $5, 0);
+            }
+
             free($3);
             free($5);
         }
