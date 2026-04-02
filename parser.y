@@ -6,6 +6,7 @@
 #include "tree.h"
 
 struct tableEntry *symbolTable = NULL;
+struct treeNode *ast = NULL;
 
 int yylex(void);
 void yyerror(const char *s);
@@ -49,7 +50,10 @@ input:
     ;
 
 block:
-    declarations formula SEMICOLON { fprintf(stderr, "PAR: SEMICOLON\n"); }
+    declarations formula SEMICOLON { 
+        fprintf(stderr, "PAR: SEMICOLON\n"); 
+        ast = $2;
+        }
     ;
 
 declarations:
@@ -164,6 +168,10 @@ quant_or_atom:
     | atom { $$ = $1; }
     | ALL SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula {
         struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", $3); 
+            exit(1); 
+            }
         if (!entry || strcmp(entry->type, "variable") != 0) {
             fprintf(stderr, "ERROR: %s is not declared as variable\n", $3);
             exit(1);
@@ -177,6 +185,10 @@ quant_or_atom:
     }
     | EXIST SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula {
         struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", $3); 
+            exit(1); 
+            }
         if (!entry || strcmp(entry->type, "variable") != 0) {
             fprintf(stderr, "ERROR: %s is not declared as variable\n", $3);
             exit(1);
@@ -194,6 +206,10 @@ quant_or_atom:
 atom:
     STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE {
         struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", $1); 
+            exit(1); 
+            }
         if(!entry || strcmp(entry->type, "predicate") != 0) {
             fprintf(stderr, "ERROR: %s is not declared as predicate\n", $1);
             exit(1);
@@ -229,6 +245,10 @@ term:
             exit(1);
         }
         $$ = makeNode(strcmp(entry->type, "variable") ==0 ? NODE_VARIABLE : NODE_FUNCTION);
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", $1); 
+            exit(1); 
+            }
         if(strcmp(entry->type,"variable")==0)
             $$->treeTypes.variableType.entry = entry;
         else
@@ -242,6 +262,10 @@ term:
     }
   | STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE {
         struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", $1); 
+            exit(1); 
+            }
         if(!entry || strcmp(entry->type, "function") !=0) {
             fprintf(stderr, "ERROR: %s is not a function\n", $1);
             exit(1);
@@ -273,7 +297,14 @@ int main(int argc, char *argv[]){
 
     int result = yyparse();
 
+    if(result == 0) {
+        fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
+        printTree(ast, 0);
+        fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
+    }
+
     printSymbolTable(symbolTable);
+    deleteTree(ast);
 
     return result;
 }

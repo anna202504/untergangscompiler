@@ -83,40 +83,71 @@ void printTree(struct treeNode *root, int level) {
         return;
     }
 
+    fprintf(stderr, "STP: ");
     for (int i = 0; i < level; i++) {
-        printf("  ");
+        fprintf(stderr, ".");
     }
 
     switch (root->nodeType) {
         case NODE_QUANTOR: 
-            printf("Quantor Node\n");
+            if (root->treeTypes.quantorType.quantorType == FORALL) {
+                fprintf(stderr, "ALL\n");
+            } else {
+                fprintf(stderr, "EXIST\n");
+            }
+            fprintf(stderr, "STP: ");
+            for (int i = 0; i <= level; i++) {
+                fprintf(stderr, ".");
+            }
+            fprintf(stderr, "Variable: %s\n", root->treeTypes.quantorType.var->identifier);
             printTree(root->treeTypes.quantorType.formula, level + 1);
             break;
         case NODE_BINARY_OPERATOR:
-            printf("Binary Operator Node\n");
+            switch (root->treeTypes.binaryType.operatorType) {
+                case BINOP_AND:
+                    fprintf(stderr, "AND\n");
+                    break;
+                case BINOP_OR:
+                    fprintf(stderr, "OR\n");
+                    break;
+                case BINOP_IMPLIES:
+                    fprintf(stderr, "IMPLICATION\n");
+                    break;
+                case BINOP_IFF:
+                    fprintf(stderr, "EQUIVALENT\n");
+                    break;
+                default:
+                    fprintf(stderr, "Error: Invalid binary operator type %d.\n", root->treeTypes.binaryType.operatorType);
+            }
             printTree(root->treeTypes.binaryType.left, level + 1);
             printTree(root->treeTypes.binaryType.right, level + 1);
             break;
         case NODE_UNARY_OPERATOR: 
-            printf("Unary Operator Node\n");
+            switch (root->treeTypes.unaryType.operatorType) {
+                case UOP_NOT:
+                    fprintf(stderr, "NOT\n");
+                    break;
+                default:
+                    fprintf(stderr, "Error: Invalid unary operator type %d.\n", root->treeTypes.unaryType.operatorType);
+            }
             printTree(root->treeTypes.unaryType.child, level + 1);
             break;
         case NODE_PREDICATE: 
-            printf("Predicate Node\n");
+            fprintf(stderr, "Predicate: %s\n", root->treeTypes.predicatType.entry->identifier);
             printTree(root->treeTypes.predicatType.arguments, level + 1);
             break;
         case NODE_FUNCTION: 
-            printf("Function Node\n");
+            fprintf(stderr, "Function: %s\n", root->treeTypes.functionType.entry->identifier);
             printTree(root->treeTypes.functionType.arguments, level + 1);
             break;
         case NODE_VARIABLE: 
-            printf("Variable Node\n");
+            fprintf(stderr, "Variable: %s\n", root->treeTypes.variableType.entry->identifier);
             break;
         case NODE_NUMBER: 
-            printf("Number Node\n");
+            fprintf(stderr, "Number: %d\n", root->treeTypes.numberType.value);
             break;
         case NODE_BOOL: 
-            printf("Bool Node\n");
+            fprintf(stderr, "%s\n", root->treeTypes.boolType.value ? "TRUE" : "FALSE");
             break;
         default:
             fprintf(stderr, "Error: Invalid node type %d.\n", root->nodeType);

@@ -137,6 +137,7 @@
 #include "tree.h"
 
 struct tableEntry *symbolTable = NULL;
+struct treeNode *ast = NULL;
 
 int yylex(void);
 void yyerror(const char *s);
@@ -163,7 +164,7 @@ extern FILE *yyin;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 15 "parser.y"
+#line 16 "parser.y"
 {
     char* str;
     int val;
@@ -171,7 +172,7 @@ typedef union YYSTYPE
     char id[101];
 }
 /* Line 193 of yacc.c.  */
-#line 175 "parser.c"
+#line 176 "parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -184,7 +185,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 188 "parser.c"
+#line 189 "parser.c"
 
 #ifdef short
 # undef short
@@ -480,12 +481,12 @@ static const yytype_int8 yyrhs[] =
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    47,    47,    48,    52,    56,    57,    61,    70,    79,
-      91,    95,    96,   107,   108,   119,   120,   131,   132,   143,
-     144,   154,   159,   164,   165,   178,   191,   195,   209,   210,
-     214,   215,   225,   238,   243
+       0,    48,    48,    49,    53,    60,    61,    65,    74,    83,
+      95,    99,   100,   111,   112,   123,   124,   135,   136,   147,
+     148,   158,   163,   168,   169,   186,   203,   207,   225,   226,
+     230,   231,   241,   258,   263
 };
 #endif
 
@@ -1429,12 +1430,15 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 52 "parser.y"
-    { fprintf(stderr, "PAR: SEMICOLON\n"); ;}
+#line 53 "parser.y"
+    { 
+        fprintf(stderr, "PAR: SEMICOLON\n"); 
+        ast = (yyvsp[(2) - (3)].p);
+        ;}
     break;
 
   case 7:
-#line 61 "parser.y"
+#line 65 "parser.y"
     {
         fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].val));
         if (getSymbolEntry(symbolTable, (yyvsp[(3) - (5)].str)) != NULL) {
@@ -1447,7 +1451,7 @@ yyreduce:
     break;
 
   case 8:
-#line 70 "parser.y"
+#line 74 "parser.y"
     {
         fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].val));
         if (getSymbolEntry(symbolTable, (yyvsp[(3) - (5)].str)) != NULL) {
@@ -1460,7 +1464,7 @@ yyreduce:
     break;
 
   case 9:
-#line 79 "parser.y"
+#line 83 "parser.y"
     {
         fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].str));
         if (getSymbolEntry(symbolTable, (yyvsp[(3) - (5)].str)) != NULL) {
@@ -1473,12 +1477,12 @@ yyreduce:
     break;
 
   case 11:
-#line 95 "parser.y"
+#line 99 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 12:
-#line 96 "parser.y"
+#line 100 "parser.y"
     { 
         fprintf(stderr,"PAR: JUNCTOR: EQUIV\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1490,12 +1494,12 @@ yyreduce:
     break;
 
   case 13:
-#line 107 "parser.y"
+#line 111 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 14:
-#line 108 "parser.y"
+#line 112 "parser.y"
     { 
         fprintf(stderr,"PAR: JUNCTOR: IMPLICATION\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1507,12 +1511,12 @@ yyreduce:
     break;
 
   case 15:
-#line 119 "parser.y"
+#line 123 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 16:
-#line 120 "parser.y"
+#line 124 "parser.y"
     { 
         fprintf(stderr,"PAR: JUNCTOR: OR\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1524,12 +1528,12 @@ yyreduce:
     break;
 
   case 17:
-#line 131 "parser.y"
+#line 135 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 18:
-#line 132 "parser.y"
+#line 136 "parser.y"
     { 
         fprintf(stderr,"PAR: JUNCTOR: AND\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1541,12 +1545,12 @@ yyreduce:
     break;
 
   case 19:
-#line 143 "parser.y"
+#line 147 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 20:
-#line 144 "parser.y"
+#line 148 "parser.y"
     { 
         fprintf(stderr,"PAR: JUNCTOR: NOT\n"); 
         (yyval.p) = makeNode(NODE_UNARY_OPERATOR);
@@ -1557,7 +1561,7 @@ yyreduce:
     break;
 
   case 21:
-#line 154 "parser.y"
+#line 158 "parser.y"
     { 
         (yyval.p) = makeNode(NODE_BOOL);
         (yyval.p)->treeTypes.boolType.value = 1;
@@ -1566,7 +1570,7 @@ yyreduce:
     break;
 
   case 22:
-#line 159 "parser.y"
+#line 163 "parser.y"
     { 
         (yyval.p) = makeNode(NODE_BOOL);
         (yyval.p)->treeTypes.boolType.value = 0;
@@ -1575,14 +1579,18 @@ yyreduce:
     break;
 
   case 23:
-#line 164 "parser.y"
+#line 168 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 24:
-#line 165 "parser.y"
+#line 169 "parser.y"
     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(3) - (5)].str));
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", (yyvsp[(3) - (5)].str)); 
+            exit(1); 
+            }
         if (!entry || strcmp(entry->type, "variable") != 0) {
             fprintf(stderr, "ERROR: %s is not declared as variable\n", (yyvsp[(3) - (5)].str));
             exit(1);
@@ -1597,9 +1605,13 @@ yyreduce:
     break;
 
   case 25:
-#line 178 "parser.y"
+#line 186 "parser.y"
     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(3) - (5)].str));
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", (yyvsp[(3) - (5)].str)); 
+            exit(1); 
+            }
         if (!entry || strcmp(entry->type, "variable") != 0) {
             fprintf(stderr, "ERROR: %s is not declared as variable\n", (yyvsp[(3) - (5)].str));
             exit(1);
@@ -1614,14 +1626,18 @@ yyreduce:
     break;
 
   case 26:
-#line 191 "parser.y"
+#line 203 "parser.y"
     { (yyval.p) = (yyvsp[(2) - (3)].p); ;}
     break;
 
   case 27:
-#line 195 "parser.y"
+#line 207 "parser.y"
     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(1) - (4)].str));
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", (yyvsp[(1) - (4)].str)); 
+            exit(1); 
+            }
         if(!entry || strcmp(entry->type, "predicate") != 0) {
             fprintf(stderr, "ERROR: %s is not declared as predicate\n", (yyvsp[(1) - (4)].str));
             exit(1);
@@ -1634,22 +1650,22 @@ yyreduce:
     break;
 
   case 28:
-#line 209 "parser.y"
+#line 225 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 29:
-#line 210 "parser.y"
+#line 226 "parser.y"
     { (yyval.p) = NULL; ;}
     break;
 
   case 30:
-#line 214 "parser.y"
+#line 230 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 31:
-#line 215 "parser.y"
+#line 231 "parser.y"
     {
         struct treeNode *last = (yyvsp[(1) - (3)].p);
         while(last->next) last = last->next;
@@ -1660,7 +1676,7 @@ yyreduce:
     break;
 
   case 32:
-#line 225 "parser.y"
+#line 241 "parser.y"
     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(1) - (1)].str));
         if(!entry || (strcmp(entry->type, "variable") !=0 && strcmp(entry->type,"function") !=0)) {
@@ -1668,6 +1684,10 @@ yyreduce:
             exit(1);
         }
         (yyval.p) = makeNode(strcmp(entry->type, "variable") ==0 ? NODE_VARIABLE : NODE_FUNCTION);
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", (yyvsp[(1) - (1)].str)); 
+            exit(1); 
+            }
         if(strcmp(entry->type,"variable")==0)
             (yyval.p)->treeTypes.variableType.entry = entry;
         else
@@ -1677,7 +1697,7 @@ yyreduce:
     break;
 
   case 33:
-#line 238 "parser.y"
+#line 258 "parser.y"
     {
         (yyval.p) = makeNode(NODE_NUMBER);
         (yyval.p)->treeTypes.numberType.value = (yyvsp[(1) - (1)].val);
@@ -1686,9 +1706,13 @@ yyreduce:
     break;
 
   case 34:
-#line 243 "parser.y"
+#line 263 "parser.y"
     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(1) - (4)].str));
+        if(entry == NULL) { 
+            fprintf(stderr, "ERROR: %s not declared\n", (yyvsp[(1) - (4)].str)); 
+            exit(1); 
+            }
         if(!entry || strcmp(entry->type, "function") !=0) {
             fprintf(stderr, "ERROR: %s is not a function\n", (yyvsp[(1) - (4)].str));
             exit(1);
@@ -1702,7 +1726,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1706 "parser.c"
+#line 1730 "parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1916,7 +1940,7 @@ yyreturn:
 }
 
 
-#line 256 "parser.y"
+#line 280 "parser.y"
 
 
 void yyerror(const char *s) {
@@ -1937,7 +1961,14 @@ int main(int argc, char *argv[]){
 
     int result = yyparse();
 
+    if(result == 0) {
+        fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
+        printTree(ast, 0);
+        fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
+    }
+
     printSymbolTable(symbolTable);
+    deleteTree(ast);
 
     return result;
 }
