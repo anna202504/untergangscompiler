@@ -835,7 +835,7 @@ YY_RULE_SETUP
 case 12:
 YY_RULE_SETUP
 #line 28 "scanner.l"
-{ fprintf(stderr, "LEX: OPERATOR: IMPLIES\n"); return IMPLIES;}
+{ fprintf(stderr, "LEX: OPERATOR: IMPLIES\n"); return BINOP_IMPLIES;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
@@ -850,7 +850,7 @@ YY_RULE_SETUP
 case 15:
 YY_RULE_SETUP
 #line 31 "scanner.l"
-{ fprintf(stderr, "LEX: OPERATOR: NOT\n"); return NOT;}
+{ fprintf(stderr, "LEX: OPERATOR: NOT\n"); return UNARY_NOT;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP

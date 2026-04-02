@@ -47,11 +47,11 @@
      ALL = 263,
      TRUE = 264,
      FALSE = 265,
-     AND = 266,
-     OR = 267,
-     NOT = 268,
-     IMPLIES = 269,
-     EQUIV = 270,
+     BIN_AND = 266,
+     BIN_OR = 267,
+     UNARY_NOT = 268,
+     BIN_IMPLIES = 269,
+     BIN_EQUIV = 270,
      BRACKET_OPEN = 271,
      BRACKET_CLOSE = 272,
      SQUARE_BRACKET_OPEN = 273,
@@ -60,7 +60,12 @@
      COLON = 276,
      SEMICOLON = 277,
      INT = 278,
-     STRING = 279
+     STRING = 279,
+     OR = 280,
+     AND = 281,
+     IMPLIES = 282,
+     EQUIV = 283,
+     NOT = 284
    };
 #endif
 /* Tokens.  */
@@ -72,11 +77,11 @@
 #define ALL 263
 #define TRUE 264
 #define FALSE 265
-#define AND 266
-#define OR 267
-#define NOT 268
-#define IMPLIES 269
-#define EQUIV 270
+#define BIN_AND 266
+#define BIN_OR 267
+#define UNARY_NOT 268
+#define BIN_IMPLIES 269
+#define BIN_EQUIV 270
 #define BRACKET_OPEN 271
 #define BRACKET_CLOSE 272
 #define SQUARE_BRACKET_OPEN 273
@@ -86,19 +91,26 @@
 #define SEMICOLON 277
 #define INT 278
 #define STRING 279
+#define OR 280
+#define AND 281
+#define IMPLIES 282
+#define EQUIV 283
+#define NOT 284
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 14 "parser.y"
+#line 15 "parser.y"
 {
     char* str;
     int val;
+    struct treeNode *p;
+    char id[101];
 }
 /* Line 1529 of yacc.c.  */
-#line 102 "parser.h"
+#line 114 "parser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
