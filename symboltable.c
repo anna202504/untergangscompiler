@@ -24,3 +24,15 @@ struct tableEntry *getSymbolEntry(struct tableEntry *head, const char *identifie
     }
     return NULL;
 }
+
+void clearSymbolTable(struct tableEntry **head) {
+    struct tableEntry *current = *head;
+    while (current != NULL) {
+        struct tableEntry *next = current->next;
+        free(current->identifier);
+        free(current->type);
+        free(current);
+        current = next;
+    }
+    *head = NULL;
+}

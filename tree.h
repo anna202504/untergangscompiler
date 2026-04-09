@@ -77,7 +77,7 @@ struct node {
     } types;
 };
 
-/* Constructor functions */
+// functions 
 struct node* create_bool_node(bool value);
 struct node* create_number_node(int value);
 struct node* create_variable_node(struct tableEntry *entry);
@@ -86,8 +86,6 @@ struct node* create_function_node(struct tableEntry *entry, struct node *args);
 struct node* create_unary_node(enum unaryOp op, struct node *formula);
 struct node* create_binary_node(enum binaryOp op, struct node *left, struct node *right);
 struct node* create_quantor_node(enum quantorOp op, struct tableEntry *var, struct node *formula);
-
-/* Tree printing and freeing */
 void print_tree(FILE *out, struct node *tree, int depth);
 void free_tree(struct node *tree);
 

@@ -12,8 +12,10 @@ CC	= gcc
 LEX	= flex
 YACC	= bison
 
+# Automatisch alle Tree-Dateien aus Input_folder generieren
+TREE_FILES = $(patsubst Input_folder/%_in.pl1,Input_folder/%_in.pl1.tree.txt,$(wildcard Input_folder/*_in.pl1))
 
-all: pl1c
+all: pl1c $(TREE_FILES)
 
 pl1c: $(objects)
 	$(CC) -o $@ $^
@@ -23,6 +25,10 @@ parser.c:	parser.y
 
 scanner.c:	scanner.l 
 	$(LEX) -t $< > $@
+
+# Pattern Rule für die Generierung von Syntax-Tree-Dateien
+Input_folder/%_in.pl1.tree.txt: Input_folder/%_in.pl1 pl1c
+	./pl1c $< > $@
 
 
 #error.o:	debug.h error.h
@@ -41,4 +47,4 @@ parser.o:	parser.h symboltable.h
 
 
 clean:
-	rm pl1c parser.c scanner.c parser.h $(objects)
+	rm pl1c parser.c scanner.c parser.h $(objects) $(TREE_FILES)

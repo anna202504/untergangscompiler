@@ -10,6 +10,14 @@ struct tableEntry *symbolTable = NULL;
 FILE *stp_output = NULL;
 struct node *root_tree = NULL;
 
+// Struktur für Formeln-Liste
+struct formula_list {
+    struct node *tree;
+    struct formula_list *next;
+};
+
+struct formula_list *formulas = NULL;
+
 int yylex(void);
 void yyerror (const char *s);
 extern FILE *yyin; 
@@ -38,6 +46,7 @@ extern FILE *yyin;
 
 %type <node> formula equiv_formula implies_formula or_formula and_formula not_formula quant_or_atom atom
 %type <node> term term_list term_list_opt
+%type <node> input block
 %type <entry> variable_ref
 
 %left OR
@@ -54,9 +63,24 @@ extern FILE *yyin;
 /* Grammatik-Regeln*/
 
 input:
+    input block {
+        // Mehrere unabhängige Blöcke verarbeiten
+        root_tree = $2;
+    }
+    | block {
+        root_tree = $1;
+    }
+    ;
+
+block:
     declarations formula SEMICOLON {
         fprintf(stderr, "PAR: SEMICOLON\n");
-        root_tree = $2;
+        // Formula zur Liste hinzufügen (behalte die globale Symbolentabelle für alle Blöcke)
+        struct formula_list *new_entry = (struct formula_list *)malloc(sizeof(struct formula_list));
+        new_entry->tree = $2;
+        new_entry->next = formulas;
+        formulas = new_entry;
+        $$ = $2;
     }
     ;
 
@@ -247,12 +271,32 @@ int main(int argc, char *argv[]){
 
     yyparse();
     
-    if (root_tree) {
-        fprintf(stp_output, "STP: ----- Start Syntax Tree Printout. -----\n");
-        print_tree(stp_output, root_tree, 0);
-        fprintf(stp_output, "STP: ----- End of Syntax Tree Printout. -----\n");
-        free_tree(root_tree);
+    // Liste umkehren, damit Formeln in korrekter Reihenfolge ausgegeben werden
+    struct formula_list *reversed = NULL;
+    struct formula_list *current = formulas;
+    while (current != NULL) {
+        struct formula_list *next = current->next;
+        current->next = reversed;
+        reversed = current;
+        current = next;
     }
+    
+    // Alle Formeln ausgeben (jetzt in korrekter Reihenfolge)
+    current = reversed;
+    while (current != NULL) {
+        if (current->tree) {
+            fprintf(stp_output, "STP: ----- Start Syntax Tree Printout. -----\n");
+            print_tree(stp_output, current->tree, 0);
+            fprintf(stp_output, "STP: ----- End of Syntax Tree Printout. -----\n");
+            free_tree(current->tree);
+        }
+        struct formula_list *next = current->next;
+        free(current);
+        current = next;
+    }
+    
+    // Gebe die Symbolentabelle am Ende frei
+    clearSymbolTable(&symbolTable);
     
     if (stp_output) fclose(stp_output);
     if (fp) fclose(fp);

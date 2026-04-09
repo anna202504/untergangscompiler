@@ -4,7 +4,6 @@
 #include "tree.h"
 #include "symboltable.h"
 
-/* Constructor functions for AST nodes */
 
 struct node* create_bool_node(bool value) {
     struct node *n = malloc(sizeof(struct node));
@@ -69,7 +68,8 @@ struct node* create_quantor_node(enum quantorOp op, struct tableEntry *var, stru
     return n;
 }
 
-/* Print tree with depth indentation */
+
+// tree print with depth
 void print_tree(FILE *out, struct node *tree, int depth) {
     if (!tree) return;
     
@@ -112,7 +112,7 @@ void print_tree(FILE *out, struct node *tree, int depth) {
                 case OP_OR: op_name = "OR"; break;
                 case OP_IMPLIES: op_name = "IMPLICATION"; break;
                 case OP_EQUIV: op_name = "EQUIVALENT"; break;
-                case OP_ARGLIST: op_name = NULL; break;  // Don't print arglist
+                case OP_ARGLIST: op_name = NULL; break; 
                 default: op_name = "UNKNOWN"; break;
             }
             if (op_name) {
@@ -120,7 +120,6 @@ void print_tree(FILE *out, struct node *tree, int depth) {
                 print_tree(out, tree->types.binaryType.left, depth + 1);
                 print_tree(out, tree->types.binaryType.right, depth + 1);
             } else {
-                // For ARGLIST, print both arguments at the same depth
                 print_tree(out, tree->types.binaryType.left, depth);
                 print_tree(out, tree->types.binaryType.right, depth);
             }
