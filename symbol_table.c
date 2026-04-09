@@ -21,7 +21,6 @@ struct tableEntry *getSymbolEntry(struct tableEntry *head, char *identifier) {
         }
         current = current->next;
     }
-    fprintf(stderr, "Error: Identifier '%s' not found in symbol table.\n", identifier);
     return NULL;
 }
 
@@ -39,4 +38,16 @@ void printSymbolTable(struct tableEntry *head) {
     }
 
     printf("---------------------\n");
+}
+
+void clearSymbolTable(struct tableEntry **head) {
+    struct tableEntry *current = *head;
+    while (current != NULL) {
+        struct tableEntry *temp = current;
+        current = current->next;
+        free(temp->identifier);
+        free(temp->type);
+        free(temp);
+    }
+    *head = NULL;
 }

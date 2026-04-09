@@ -10,7 +10,7 @@ ID [a-zA-Z][a-zA-Z0-9]*
 
 %%
 
-"/*"(.|\n)*?"*/" {fprintf(stderr, "LEX: COMMENT: %s\n", yytext);}  
+"/*"([^*]|\*+[^*/])*\*+"/"  { /* ignore comment */ }  
 [ \t\r\n]+ ; 
 
 "DECLARE" {fprintf(stderr, "LEX: KEY: DECLARE\n"); return DECLARE;}
