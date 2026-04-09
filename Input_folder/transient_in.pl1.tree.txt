@@ -1,0 +1,19 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: ALL
+STP: .Variable: x
+STP: .ALL
+STP: ..Variable: y
+STP: ..ALL
+STP: ...Variable: z
+STP: ...IMPLICATION
+STP: ....AND
+STP: .....Predicate: R
+STP: ......Variable: x
+STP: ......Variable: y
+STP: .....Predicate: R
+STP: ......Variable: y
+STP: ......Variable: z
+STP: ....Predicate: R
+STP: .....Variable: x
+STP: .....Variable: z
+STP: ----- End of Syntax Tree Printout. -----

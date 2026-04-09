@@ -1,0 +1,5 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: EQUIVALENT
+STP: .Predicate: A
+STP: .Predicate: B
+STP: ----- End of Syntax Tree Printout. -----

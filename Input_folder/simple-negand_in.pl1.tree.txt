@@ -1,0 +1,6 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: NOT
+STP: .AND
+STP: ..Predicate: P
+STP: ..Predicate: Q
+STP: ----- End of Syntax Tree Printout. -----

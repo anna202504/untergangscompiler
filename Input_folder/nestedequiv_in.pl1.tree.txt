@@ -1,0 +1,19 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: EQUIVALENT
+STP: .EQUIVALENT
+STP: ..ALL
+STP: ...Variable: x
+STP: ...Predicate: P
+STP: ....Variable: x
+STP: ..EXIST
+STP: ...Variable: x
+STP: ...Predicate: P
+STP: ....Variable: x
+STP: .ALL
+STP: ..Variable: x
+STP: ..EQUIVALENT
+STP: ...Predicate: Q
+STP: ....Variable: x
+STP: ...Predicate: P
+STP: ....Variable: x
+STP: ----- End of Syntax Tree Printout. -----

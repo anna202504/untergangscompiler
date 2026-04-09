@@ -1,0 +1,7 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: NOT
+STP: .ALL
+STP: ..Variable: x
+STP: ..Predicate: P
+STP: ...Variable: x
+STP: ----- End of Syntax Tree Printout. -----

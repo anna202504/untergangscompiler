@@ -1,0 +1,7 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: IMPLICATION
+STP: .NOT
+STP: ..NOT
+STP: ...Predicate: P
+STP: .Predicate: Q
+STP: ----- End of Syntax Tree Printout. -----

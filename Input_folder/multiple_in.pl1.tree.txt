@@ -1,0 +1,54 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: AND
+STP: .AND
+STP: ..AND
+STP: ...EXIST
+STP: ....Variable: x
+STP: ....AND
+STP: .....Predicate: Kauft
+STP: ......Function: Tim
+STP: ......Variable: x
+STP: .....Predicate: Kuerbis
+STP: ......Variable: x
+STP: ...ALL
+STP: ....Variable: x
+STP: ....ALL
+STP: .....Variable: y
+STP: .....IMPLICATION
+STP: ......AND
+STP: .......Predicate: Kauft
+STP: ........Variable: x
+STP: ........Variable: y
+STP: .......Predicate: Kuerbis
+STP: ........Variable: y
+STP: ......OR
+STP: .......Predicate: Isst
+STP: ........Variable: x
+STP: ........Variable: y
+STP: .......Predicate: Schnitzt
+STP: ........Variable: x
+STP: ........Variable: y
+STP: ..ALL
+STP: ...Variable: x
+STP: ...IMPLICATION
+STP: ....Predicate: Kind
+STP: .....Variable: x
+STP: ....ALL
+STP: .....Variable: y
+STP: .....IMPLICATION
+STP: ......Predicate: Kuerbis
+STP: .......Variable: y
+STP: ......NOT
+STP: .......Predicate: Isst
+STP: ........Variable: x
+STP: ........Variable: y
+STP: .NOT
+STP: ..IMPLICATION
+STP: ...Predicate: Kind
+STP: ....Function: Tim
+STP: ...EXIST
+STP: ....Variable: x
+STP: ....Predicate: Schnitzt
+STP: .....Function: Tim
+STP: .....Variable: x
+STP: ----- End of Syntax Tree Printout. -----

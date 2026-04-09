@@ -1,0 +1,18 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: AND
+STP: .AND
+STP: ..Predicate: A
+STP: ..OR
+STP: ...NOT
+STP: ....Predicate: B
+STP: ...Predicate: C
+STP: .OR
+STP: ..NOT
+STP: ...IMPLICATION
+STP: ....Predicate: B
+STP: ....Predicate: C
+STP: ..EQUIVALENT
+STP: ...Predicate: C
+STP: ...NOT
+STP: ....Predicate: A
+STP: ----- End of Syntax Tree Printout. -----

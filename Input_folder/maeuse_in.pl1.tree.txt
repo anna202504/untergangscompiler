@@ -1,0 +1,71 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: AND
+STP: .AND
+STP: ..AND
+STP: ...AND
+STP: ....ALL
+STP: .....Variable: x
+STP: .....IMPLICATION
+STP: ......Predicate: Hund
+STP: .......Variable: x
+STP: ......Predicate: bellt
+STP: .......Variable: x
+STP: ....ALL
+STP: .....Variable: x
+STP: .....ALL
+STP: ......Variable: y
+STP: ......IMPLICATION
+STP: .......AND
+STP: ........Predicate: hat
+STP: .........Variable: x
+STP: .........Variable: y
+STP: ........Predicate: Katze
+STP: .........Variable: y
+STP: .......NOT
+STP: ........EXIST
+STP: .........Variable: z
+STP: .........AND
+STP: ..........Predicate: hat
+STP: ...........Variable: x
+STP: ...........Variable: z
+STP: ..........Predicate: Maus
+STP: ...........Variable: z
+STP: ...ALL
+STP: ....Variable: x
+STP: ....IMPLICATION
+STP: .....Predicate: leicht
+STP: ......Variable: x
+STP: .....NOT
+STP: ......EXIST
+STP: .......Variable: y
+STP: .......AND
+STP: ........Predicate: hat
+STP: .........Variable: x
+STP: .........Variable: y
+STP: ........Predicate: bellt
+STP: .........Variable: y
+STP: ..EXIST
+STP: ...Variable: x
+STP: ...AND
+STP: ....Predicate: hat
+STP: .....Function: Julia
+STP: .....Variable: x
+STP: ....OR
+STP: .....Predicate: Hund
+STP: ......Variable: x
+STP: .....Predicate: Katze
+STP: ......Variable: x
+STP: .NOT
+STP: ..IMPLICATION
+STP: ...Predicate: leicht
+STP: ....Function: Julia
+STP: ...NOT
+STP: ....EXIST
+STP: .....Variable: x
+STP: .....AND
+STP: ......Predicate: hat
+STP: .......Function: Julia
+STP: .......Variable: x
+STP: ......Predicate: Maus
+STP: .......Variable: x
+STP: ----- End of Syntax Tree Printout. -----
