@@ -126,9 +126,36 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "symboltable.h"
+#include "tree.h"
 
 struct tableEntry *symbolTable = NULL; 
+struct node *astRoot = NULL;
+
+static struct tableEntry *findSymbolEntrySilent(struct tableEntry *head, const char *identifier)
+{
+    struct tableEntry *current = head;
+    while (current != NULL)
+    {
+        if (strcmp(current->identifier, identifier) == 0)
+            return current;
+        current = current->next;
+    }
+    return NULL;
+}
+
+static int countArgumentNodes(struct node *head)
+{
+    int count = 0;
+    struct node *current = head;
+    while (current != NULL)
+    {
+        count++;
+        current = current->next;
+    }
+    return count;
+}
 
 int yylex(void);
 void yyerror (const char *s);
@@ -155,13 +182,15 @@ extern FILE *yyin;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 13 "parser.y"
+#line 40 "parser.y"
 {
     char* str;
     int val;
+    struct node *p; 
+    char id[101];
 }
 /* Line 193 of yacc.c.  */
-#line 165 "parser.c"
+#line 194 "parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -174,7 +203,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 178 "parser.c"
+#line 207 "parser.c"
 
 #ifdef short
 # undef short
@@ -470,12 +499,12 @@ static const yytype_int8 yyrhs[] =
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    47,    47,    47,    52,    56,    56,    62,    67,    71,
-      87,    91,    92,    96,    97,   101,   102,   106,   107,   111,
-     112,   116,   117,   118,   119,   123,   127,   131,   138,   139,
-     143,   143,   147,   151,   154
+       0,    79,    79,    79,    84,    95,    95,   101,   111,   121,
+     137,   141,   142,   154,   155,   167,   168,   180,   181,   193,
+     194,   205,   212,   219,   220,   245,   270,   274,   299,   300,
+     304,   305,   316,   333,   341
 };
 #endif
 
@@ -1418,32 +1447,50 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 52 "parser.y"
-    {fprintf(stderr, "PAR: SEMICOLON\n");;}
+#line 84 "parser.y"
+    {
+        if (astRoot != NULL)
+            deleteNode(astRoot);
+        astRoot = (yyvsp[(2) - (3)].p);
+        fprintf(stderr, "PAR: SEMICOLON\n");
+        printNode(astRoot, 0);
+        (yyval.p) = (yyvsp[(2) - (3)].p);
+    ;}
     break;
 
   case 7:
-#line 62 "parser.y"
+#line 101 "parser.y"
     {
             fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].val));
+            if(findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str))){
+                yyerror("Predicate already declared"); 
+            }
+            else {
+                addSymbolEntry(&symbolTable, (yyvsp[(3) - (5)].str), "predicate", (yyvsp[(5) - (5)].val));
+            }
             free((yyvsp[(3) - (5)].str));
-
         ;}
     break;
 
   case 8:
-#line 67 "parser.y"
+#line 111 "parser.y"
     {
-            fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].val));
+            fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].val));            
+            if(findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str))){
+                yyerror("Function already declared"); 
+            }
+            else {
+                addSymbolEntry(&symbolTable, (yyvsp[(3) - (5)].str), "function", (yyvsp[(5) - (5)].val));
+            }
             free((yyvsp[(3) - (5)].str));
         ;}
     break;
 
   case 9:
-#line 71 "parser.y"
+#line 121 "parser.y"
     {
             fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].str));
-            if(getSymbolEntry(symbolTable, (yyvsp[(3) - (5)].str))){
+            if(findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str))){
                 yyerror("Variable already declared"); 
             }
             else {
@@ -1455,91 +1502,306 @@ yyreduce:
         ;}
     break;
 
+  case 10:
+#line 137 "parser.y"
+    { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
+    break;
+
+  case 11:
+#line 141 "parser.y"
+    { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
+    break;
+
   case 12:
-#line 92 "parser.y"
-    { fprintf(stderr,"PAR: JUNCTOR: EQUIV\n"); ;}
+#line 142 "parser.y"
+    {
+        fprintf(stderr,"PAR: JUNCTOR: EQUIV\n");
+        (yyval.p) = makeNode(BType);
+        if (!(yyval.p)) YYABORT;
+        (yyval.p)->bType.binaryOperator = B_EQUIV;
+        (yyval.p)->bType.leftnode = (yyvsp[(1) - (3)].p);
+        (yyval.p)->bType.rightnode = (yyvsp[(3) - (3)].p);
+                fprintf(stderr, "SYT: Binary Node created - Type EQUIV\n");
+      ;}
+    break;
+
+  case 13:
+#line 154 "parser.y"
+    { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 14:
-#line 97 "parser.y"
-    { fprintf(stderr,"PAR: JUNCTOR: IMPLICATION\n"); ;}
+#line 155 "parser.y"
+    {
+        fprintf(stderr,"PAR: JUNCTOR: IMPLICATION\n");
+        (yyval.p) = makeNode(BType);
+        if (!(yyval.p)) YYABORT;
+        (yyval.p)->bType.binaryOperator = B_IMPLIES;
+        (yyval.p)->bType.leftnode = (yyvsp[(1) - (3)].p);
+        (yyval.p)->bType.rightnode = (yyvsp[(3) - (3)].p);
+                fprintf(stderr, "SYT: Binary Node created - Type IMPLIES\n");
+      ;}
+    break;
+
+  case 15:
+#line 167 "parser.y"
+    { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 16:
-#line 102 "parser.y"
-    { fprintf(stderr,"PAR: JUNCTOR: OR\n"); ;}
+#line 168 "parser.y"
+    {
+        fprintf(stderr,"PAR: JUNCTOR: OR\n");
+        (yyval.p) = makeNode(BType);
+        if (!(yyval.p)) YYABORT;
+        (yyval.p)->bType.binaryOperator = B_OR;
+        (yyval.p)->bType.leftnode = (yyvsp[(1) - (3)].p);
+        (yyval.p)->bType.rightnode = (yyvsp[(3) - (3)].p);
+                fprintf(stderr, "SYT: Binary Node created - Type OR\n");
+      ;}
+    break;
+
+  case 17:
+#line 180 "parser.y"
+    { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 18:
-#line 107 "parser.y"
-    { fprintf(stderr,"PAR: JUNCTOR: AND\n"); ;}
+#line 181 "parser.y"
+    {
+        fprintf(stderr,"PAR: JUNCTOR: AND\n");
+        (yyval.p) = makeNode(BType);
+        if (!(yyval.p)) YYABORT;
+        (yyval.p)->bType.binaryOperator = B_AND;
+        (yyval.p)->bType.leftnode = (yyvsp[(1) - (3)].p);
+        (yyval.p)->bType.rightnode = (yyvsp[(3) - (3)].p);
+                fprintf(stderr, "SYT: Binary Node created - Type AND\n");
+      ;}
+    break;
+
+  case 19:
+#line 193 "parser.y"
+    { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 20:
-#line 112 "parser.y"
-    { fprintf(stderr,"PAR: JUNCTOR: NOT\n"); ;}
+#line 194 "parser.y"
+    {
+        fprintf(stderr,"PAR: JUNCTOR: NOT\n");
+        (yyval.p) = makeNode(UType);
+        if (!(yyval.p)) YYABORT;
+                (yyval.p)->uType.unaryOperator = U_NOT;
+        (yyval.p)->uType.operand = (yyvsp[(2) - (2)].p);
+        fprintf(stderr, "SYT: Unary Node created - Type NOT\n");
+      ;}
     break;
 
   case 21:
-#line 116 "parser.y"
-    { fprintf(stderr,"PAR: CONST: TRUE\n"); ;}
+#line 205 "parser.y"
+    {
+        fprintf(stderr,"PAR: CONST: TRUE\n");
+        (yyval.p) = makeNode(BooType);
+        if (!(yyval.p)) YYABORT;
+        (yyval.p)->booType.value = true;
+                fprintf(stderr, "SYT: Bool Node created (TRUE)\n");
+      ;}
     break;
 
   case 22:
-#line 117 "parser.y"
-    { fprintf(stderr,"PAR: CONST: FALSE\n"); ;}
+#line 212 "parser.y"
+    {
+        fprintf(stderr,"PAR: CONST: FALSE\n");
+        (yyval.p) = makeNode(BooType);
+        if (!(yyval.p)) YYABORT;
+        (yyval.p)->booType.value = false;
+                fprintf(stderr, "SYT: Bool Node created (FALSE)\n");
+      ;}
+    break;
+
+  case 23:
+#line 219 "parser.y"
+    { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 24:
-#line 119 "parser.y"
+#line 220 "parser.y"
     {
         fprintf(stderr,"PAR: QUANTOR: ALL %s\n",(yyvsp[(3) - (5)].str)); 
+        struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str));
+        if (!entry)
+            yyerror("Quantified variable not declared");
+
+        struct node *varNode = makeNode(VType);
+        struct node *qNode = makeNode(QType);
+        if (!varNode || !qNode)
+        {
+            deleteNode(varNode);
+            deleteNode(qNode);
+            free((yyvsp[(3) - (5)].str));
+            YYABORT;
+        }
+
+        varNode->vType.symbolTableEntry = entry;
+        fprintf(stderr, "SYT: Variable Node created\n");
+        qNode->qType.quantorOperator = FORALL;
+        qNode->qType.quantorVariable = varNode;
+        qNode->qType.quantorBody = (yyvsp[(5) - (5)].p);
+        (yyval.p) = qNode;
+        fprintf(stderr, "SYT: Quantor Node created - Type ALL\n");
         free((yyvsp[(3) - (5)].str)); 
         ;}
     break;
 
   case 25:
-#line 123 "parser.y"
+#line 245 "parser.y"
     {
         fprintf(stderr,"PAR: QUANTOR: EXIST %s\n",(yyvsp[(3) - (5)].str)); 
+        struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str));
+        if (!entry)
+            yyerror("Quantified variable not declared");
+
+        struct node *varNode = makeNode(VType);
+        struct node *qNode = makeNode(QType);
+        if (!varNode || !qNode)
+        {
+            deleteNode(varNode);
+            deleteNode(qNode);
+            free((yyvsp[(3) - (5)].str));
+            YYABORT;
+        }
+
+        varNode->vType.symbolTableEntry = entry;
+        fprintf(stderr, "SYT: Variable Node created\n");
+        qNode->qType.quantorOperator = EXISTS;
+        qNode->qType.quantorVariable = varNode;
+        qNode->qType.quantorBody = (yyvsp[(5) - (5)].p);
+        (yyval.p) = qNode;
+        fprintf(stderr, "SYT: Quantor Node created - Type EXIST\n");
         free((yyvsp[(3) - (5)].str)); 
         ;}
     break;
 
+  case 26:
+#line 270 "parser.y"
+    { (yyval.p) = (yyvsp[(2) - (3)].p); ;}
+    break;
+
   case 27:
-#line 131 "parser.y"
+#line 274 "parser.y"
     {
         fprintf(stderr, "PAR: ATOM: %s()\n", (yyvsp[(1) - (4)].str));
+        struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(1) - (4)].str));
+        int argCount = countArgumentNodes((yyvsp[(3) - (4)].p));
+        if (!entry)
+            yyerror("Predicate not declared");
+        else if (entry->arity != argCount)
+            yyerror("Predicate arity mismatch");
+
+        (yyval.p) = makeNode(PType);
+        if (!(yyval.p))
+        {
+            deleteNode((yyvsp[(3) - (4)].p));
+            free((yyvsp[(1) - (4)].str));
+            YYABORT;
+        }
+
+        (yyval.p)->pType.symbolTableEntry = entry;
+        (yyval.p)->pType.arguments = (yyvsp[(3) - (4)].p);
+        fprintf(stderr, "SYT: Predicate Node created\n");
         free((yyvsp[(1) - (4)].str));
     ;}
     break;
 
+  case 28:
+#line 299 "parser.y"
+    { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
+    break;
+
+  case 29:
+#line 300 "parser.y"
+    { (yyval.p) = NULL; ;}
+    break;
+
+  case 30:
+#line 304 "parser.y"
+    { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
+    break;
+
+  case 31:
+#line 305 "parser.y"
+    {
+        struct node *last = (yyvsp[(1) - (3)].p);
+        while (last->next != NULL)
+            last = last->next;
+        last->next = (yyvsp[(3) - (3)].p);
+        (yyval.p) = (yyvsp[(1) - (3)].p);
+        fprintf(stderr, "SYT: Argument Node added to list\n");
+    ;}
+    break;
+
   case 32:
-#line 147 "parser.y"
+#line 316 "parser.y"
     {
         fprintf(stderr, "PAR: TERM: Variable/Constant %s\n", (yyvsp[(1) - (1)].str));
+        struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(1) - (1)].str));
+        if (!entry)
+            yyerror("Variable/constant not declared");
+
+        (yyval.p) = makeNode(VType);
+        if (!(yyval.p))
+        {
+            free((yyvsp[(1) - (1)].str));
+            YYABORT;
+        }
+        (yyval.p)->vType.symbolTableEntry = entry;
+        fprintf(stderr, "SYT: Variable Node created\n");
+        fprintf(stderr, "SYT: Argument Node created\n");
         free((yyvsp[(1) - (1)].str));
     ;}
     break;
 
   case 33:
-#line 151 "parser.y"
+#line 333 "parser.y"
     {
         fprintf(stderr, "PAR: TERM: Constant %d\n", (yyvsp[(1) - (1)].val));
+        (yyval.p) = makeNode(NType);
+        if (!(yyval.p)) YYABORT;
+        (yyval.p)->nType.value = (yyvsp[(1) - (1)].val);
+        fprintf(stderr, "SYT: Number Node created\n");
+        fprintf(stderr, "SYT: Argument Node created\n");
     ;}
     break;
 
   case 34:
-#line 154 "parser.y"
+#line 341 "parser.y"
     {
         fprintf(stderr, "PAR: TERM: Function %s(...)\n", (yyvsp[(1) - (4)].str));
+        struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(1) - (4)].str));
+        int argCount = countArgumentNodes((yyvsp[(3) - (4)].p));
+        if (!entry)
+            yyerror("Function not declared");
+        else if (entry->arity != argCount)
+            yyerror("Function arity mismatch");
+
+        (yyval.p) = makeNode(FType);
+        if (!(yyval.p))
+        {
+            deleteNode((yyvsp[(3) - (4)].p));
+            free((yyvsp[(1) - (4)].str));
+            YYABORT;
+        }
+
+        (yyval.p)->fType.symbolTableEntry = entry;
+        (yyval.p)->fType.arguments = (yyvsp[(3) - (4)].p);
+                fprintf(stderr, "SYT: Function Node created\n");
+                fprintf(stderr, "SYT: Argument Node created\n");
         free((yyvsp[(1) - (4)].str));
       ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1543 "parser.c"
+#line 1805 "parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1753,11 +2015,11 @@ yyreturn:
 }
 
 
-#line 166 "parser.y"
+#line 369 "parser.y"
 
 
 void yyerror(const char *s){
-    printf("Error: %s\n", s);
+    fprintf(stderr, "Error: %s\n", s);
 
 }
 
@@ -1766,12 +2028,26 @@ void yyerror(const char *s){
 
 
 int main(int argc, char *argv[]){
+    if (argc < 2)
+    {
+        fprintf(stderr, "Usage: %s <input-file>\n", argv[0]);
+        return 1;
+    }
 
     FILE *fp;
     fp = fopen(argv[1], "r");
+    if (!fp)
+    {
+        perror("fopen");
+        return 1;
+    }
+
     yyin = fp;
 
     yyparse();
+
+    fclose(fp);
+    deleteNode(astRoot);
 
     return 0;
 }
