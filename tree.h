@@ -84,4 +84,6 @@ struct treeNode *copyTree(struct treeNode *root);
 struct treeNode *deleteTree(struct treeNode *root);
 void printTree(struct treeNode *root, int level);
 
+int countArguments(struct treeNode *argList);
+
 #endif // TREE_H

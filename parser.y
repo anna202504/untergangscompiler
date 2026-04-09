@@ -23,7 +23,7 @@ extern FILE *yyin;
 %token DECLARE PREDICATE FUNCTION VARIABLE
 %token EXIST ALL
 %token TRUE FALSE
-%token BIN_AND BIN_OR UNARY_NOT BIN_IMPLIES BIN_EQUIV
+%token AND OR NOT IMPLIES EQUIV
 %token BRACKET_OPEN BRACKET_CLOSE
 %token SQUARE_BRACKET_OPEN SQUARE_BRACKET_CLOSE
 %token COMMA COLON SEMICOLON
@@ -60,8 +60,6 @@ block:
         printSymbolTable(symbolTable);
 
         deleteTree($2);
-
-        clearSymbolTable(&symbolTable);
         }
     ;
 
@@ -73,27 +71,43 @@ declarations:
 declaration:
     DECLARE PREDICATE STRING COLON INT {
         fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", $3, $5);
-        if (getSymbolEntry(symbolTable, $3) != NULL) {
-            fprintf(stderr, "ERROR: Predicate %s already declared\n", $3);
+
+        struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
+        if (entry != NULL) {
+            if (strcmp(entry->type, "predicate") != 0 || entry->arity != $5) {
+                fprintf(stderr, "ERROR: Identifier %s already declared with different type or arity\n", $3);
             exit(1);
+            }
         } else {
             addSymbolEntry(&symbolTable, $3, "predicate", $5);  
         }
     }
     | DECLARE FUNCTION STRING COLON INT {
         fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", $3, $5);
-        if (getSymbolEntry(symbolTable, $3) != NULL) {
-            fprintf(stderr, "ERROR: Function already declared\n");
+
+        struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
+        if (entry != NULL) {
+            if (strcmp(entry->type, "function") != 0 || entry->arity != $5) {
+                fprintf(stderr, "ERROR: Identifier %s already declared with different type or arity\n", $3);
             exit(1);
+            }
         } else {
             addSymbolEntry(&symbolTable, $3, "function", $5);
         }
     }
     | DECLARE VARIABLE STRING COLON STRING {
         fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", $3, $5);
-        if (getSymbolEntry(symbolTable, $3) != NULL) {
-            fprintf(stderr, "ERROR: Variable already declared\n");
+
+        if(strcmp($5, "int") != 0) {
+            fprintf(stderr, "ERROR: Variable %s must have type int\n", $3);
             exit(1);
+        }
+        struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
+        if (entry != NULL) {
+            if (strcmp(entry->type, "variable") != 0) {
+                fprintf(stderr, "ERROR: Identifier %s already declared with different type or arity\n", $3);
+            exit(1);
+            }
         } else {
             addSymbolEntry(&symbolTable, $3, "variable", 0);
         }
@@ -176,14 +190,16 @@ quant_or_atom:
       }
     | atom { $$ = $1; }
     | ALL SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula {
-            struct tableEntry *entry = malloc(sizeof(struct tableEntry));
-            entry->identifier = strdup($3);
-            entry->type = strdup("variable");
-            entry->arity = 0;
-            entry->next = NULL;
+            struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
+            if(entry == NULL) {
+                fprintf(stderr, "ERROR: Variable %s not declared\n", $3);
+                exit(1);
+            }
+            if(strcmp(entry->type, "variable") != 0) {
+                fprintf(stderr, "ERROR: %s is not a variable\n", $3);
+                exit(1);
+            }
 
-            if(getSymbolEntry(symbolTable, $3) == NULL)
-                addSymbolEntry(&symbolTable, $3, "variable", 0);
             $$ = makeNode(NODE_QUANTOR);
             $$->treeTypes.quantorType.quantorType = FORALL;
             $$->treeTypes.quantorType.var = entry;
@@ -191,16 +207,18 @@ quant_or_atom:
 
             fprintf(stderr, "SYT: Quantor Node created - FORALL %s\n", $3);
             fprintf(stderr, "PAR: QUANTOR: ALL %s\n", $3);
-    }
+        }
     | EXIST SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula {
-        struct tableEntry *entry = malloc(sizeof(struct tableEntry));
-        entry->identifier = strdup($3);
-        entry->type = strdup("variable");
-        entry->arity = 0;
-        entry->next = NULL;
-
-        if(getSymbolEntry(symbolTable, $3) == NULL)
-            addSymbolEntry(&symbolTable, $3, "variable", 0);
+        struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
+        if(entry == NULL) {
+            fprintf(stderr, "ERROR: Variable %s not declared\n", $3);
+            exit(1);
+        }
+        
+        if(strcmp(entry->type, "variable") != 0) {
+            fprintf(stderr, "ERROR: %s is not a variable\n", $3);
+            exit(1);
+        }
         $$ = makeNode(NODE_QUANTOR);
         $$->treeTypes.quantorType.quantorType = EXISTS;
         $$->treeTypes.quantorType.var = entry;
@@ -223,6 +241,13 @@ atom:
             fprintf(stderr, "ERROR: %s is not declared as predicate\n", $1);
             exit(1);
         }
+
+        int argCount = countArguments($3);
+        if(argCount != entry->arity) {
+            fprintf(stderr, "ERROR: Predicate %s expects %d argument(s), but got %d\n", $1, entry->arity, argCount);
+            exit(1);
+        }
+
         $$ = makeNode(NODE_PREDICATE);
         $$->treeTypes.predicatType.entry = entry;
         $$->treeTypes.predicatType.arguments = $3;
@@ -250,25 +275,27 @@ term:
     STRING {
         struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
         if(entry == NULL) {
-            entry = malloc(sizeof(struct tableEntry));
-            entry->identifier = strdup($1);
-            entry->type = strdup("variable");
-            entry->arity = 0;
-            entry->next = NULL;
+            fprintf(stderr, "ERROR: %s not declared\n", $1);
+            exit(1);
+        }
 
-            addSymbolEntry(&symbolTable, $1, "variable", 0);
+        if(strcmp(entry->type, "variable") == 0) {
             $$ = makeNode(NODE_VARIABLE);
             $$->treeTypes.variableType.entry = entry;
-            fprintf(stderr, "SYT: Term Node created - %s (implicit variable)\n", $1);
-        } else {
-            $$ = makeNode(strcmp(entry->type, "variable") ==0 ? NODE_VARIABLE : NODE_FUNCTION);
-
-            if(strcmp(entry->type,"variable")==0)
-                $$->treeTypes.variableType.entry = entry;
-            else
-                $$->treeTypes.functionType.entry = entry;
-
             fprintf(stderr, "SYT: Variable Node created - %s\n", $1);
+        } else if(strcmp(entry->type, "function") == 0) {
+            if(entry->arity != 0) {
+                fprintf(stderr, "ERROR: Function %s expects %d argument(s), but got 0\n", $1, entry->arity);
+                exit(1);
+            }
+
+            $$ = makeNode(NODE_FUNCTION);
+            $$->treeTypes.functionType.entry = entry;
+            $$->treeTypes.functionType.arguments = NULL;
+            fprintf(stderr, "SYT: Function Node created - %s\n", $1);
+        } else {
+            fprintf(stderr, "ERROR: %s cannot be used as term\n", $1);
+            exit(1);
         }
     }
   | INT {
@@ -282,10 +309,17 @@ term:
             fprintf(stderr, "ERROR: %s not declared\n", $1); 
             exit(1); 
             }
-        if(!entry || strcmp(entry->type, "function") !=0) {
+        if(strcmp(entry->type, "function") !=0) {
             fprintf(stderr, "ERROR: %s is not a function\n", $1);
             exit(1);
         }
+
+        int argCount = countArguments($3);
+        if(argCount != entry->arity) {
+            fprintf(stderr, "ERROR: Function %s expects %d argument(s), but got %d\n", $1, entry->arity, argCount);
+            exit(1);
+        }
+
         $$ = makeNode(NODE_FUNCTION);
         $$->treeTypes.functionType.entry = entry;
         $$->treeTypes.functionType.arguments = $3;
@@ -313,6 +347,8 @@ int main(int argc, char *argv[]){
 
     int result = yyparse();
     fclose(fp);
+
+    clearSymbolTable(&symbolTable);
 
     return result;
 }

@@ -202,3 +202,13 @@ struct treeNode *copyTree(struct treeNode *root) {
 
     return newNode;
 }
+
+int countArguments(struct treeNode *argList) {
+    int count = 0;
+    struct treeNode *current = argList;
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+    return count;
+}
