@@ -88,5 +88,6 @@ struct node* create_binary_node(enum binaryOp op, struct node *left, struct node
 struct node* create_quantor_node(enum quantorOp op, struct tableEntry *var, struct node *formula);
 void print_tree(FILE *out, struct node *tree, int depth);
 void free_tree(struct node *tree);
+int count_arguments(struct node *args);
 
 #endif

@@ -23,6 +23,7 @@ struct node* create_variable_node(struct tableEntry *entry) {
     struct node *n = malloc(sizeof(struct node));
     n->nodeType = NODE_VARIABLE;
     n->types.variableType.entry = entry;
+    fprintf(stderr, "SYT: Variable Node created\n");
     return n;
 }
 
@@ -31,6 +32,10 @@ struct node* create_predicate_node(struct tableEntry *entry, struct node *args) 
     n->nodeType = NODE_PREDICATE;
     n->types.predicateType.entry = entry;
     n->types.predicateType.arguments = args;
+    if (args) {
+        fprintf(stderr, "SYT: Argument Node created\n");
+    }
+    fprintf(stderr, "SYT: Predicate Node created\n");
     return n;
 }
 
@@ -39,6 +44,10 @@ struct node* create_function_node(struct tableEntry *entry, struct node *args) {
     n->nodeType = NODE_FUNCTION;
     n->types.functionType.entry = entry;
     n->types.functionType.arguments = args;
+    if (args) {
+        fprintf(stderr, "SYT: Argument Node created\n");
+    }
+    fprintf(stderr, "SYT: Function Node created\n");
     return n;
 }
 
@@ -56,6 +65,19 @@ struct node* create_binary_node(enum binaryOp op, struct node *left, struct node
     n->types.binaryType.op = op;
     n->types.binaryType.left = left;
     n->types.binaryType.right = right;
+    
+    const char *op_name;
+    switch (op) {
+        case OP_AND: op_name = "&"; break;
+        case OP_OR: op_name = "|"; break;
+        case OP_IMPLIES: op_name = "=>"; break;
+        case OP_EQUIV: op_name = "<=>"; break;
+        case OP_ARGLIST: 
+            fprintf(stderr, "SYT: Argument Node added to list\n");
+            return n;
+        default: op_name = "UNKNOWN"; break;
+    }
+    fprintf(stderr, "SYT: Binary Node created - Type %s\n", op_name);
     return n;
 }
 
@@ -65,6 +87,9 @@ struct node* create_quantor_node(enum quantorOp op, struct tableEntry *var, stru
     n->types.quantorType.op = op;
     n->types.quantorType.variable = create_variable_node(var);
     n->types.quantorType.formula = formula;
+    
+    const char *op_name = (op == OP_FORALL) ? "FORALL" : "EXIST";
+    fprintf(stderr, "SYT: Quantor Node created - Type %s\n", op_name);
     return n;
 }
 
@@ -162,4 +187,46 @@ void free_tree(struct node *tree) {
             break;
     }
     free(tree);
+}
+
+// Count the number of arguments in an argument list
+// An argument list is represented as either:
+// - NULL (no arguments, arity 0)
+// - A single term node (one argument)
+// - A chain of OP_ARGLIST binary nodes (multiple arguments)
+int count_arguments(struct node *args) {
+    if (!args) {
+        return 0;
+    }
+    
+    if (args->nodeType != NODE_BINARY || args->types.binaryType.op != OP_ARGLIST) {
+        // Single argument (not an ARGLIST node)
+        return 1;
+    }
+    
+    // Count arguments in the OP_ARGLIST chain
+    // The structure is: ARGLIST(left, right)
+    // where right is either another ARGLIST or the last argument
+    // We need to recursively count the left side and the right side
+    
+    int count = 1; // count the right side as one argument
+    struct node *current = args;
+    
+    while (current != NULL && current->nodeType == NODE_BINARY && 
+           current->types.binaryType.op == OP_ARGLIST) {
+        // The left side could be another ARGLIST or a single argument
+        struct node *left = current->types.binaryType.left;
+        
+        if (left && left->nodeType == NODE_BINARY && left->types.binaryType.op == OP_ARGLIST) {
+            // Left is another ARGLIST, so we move to it
+            count++; // count one more argument for the right side of this ARGLIST
+            current = left;
+        } else {
+            // Left is a single argument (not an ARGLIST)
+            count++; // count the left argument
+            break;
+        }
+    }
+    
+    return count;
 }

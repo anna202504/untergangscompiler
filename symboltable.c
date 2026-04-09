@@ -36,3 +36,15 @@ void clearSymbolTable(struct tableEntry **head) {
     }
     *head = NULL;
 }
+
+void validate_arity(struct tableEntry *entry, int actual_count) {
+    if (!entry) {
+        return;
+    }
+    
+    if (entry->arity != actual_count) {
+        fprintf(stderr, "Error: %s %s declared with arity %d but called with %d arguments\n",
+                entry->type, entry->identifier, entry->arity, actual_count);
+        exit(1);
+    }
+}

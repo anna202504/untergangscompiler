@@ -554,8 +554,8 @@ static const yytype_uint8 yyrline[] =
 {
        0,    66,    66,    70,    76,    88,    88,    94,   100,   105,
      119,   123,   124,   131,   132,   139,   140,   147,   148,   155,
-     156,   163,   167,   171,   172,   176,   180,   184,   194,   207,
-     208,   212,   213,   220,   236,   240
+     156,   163,   167,   171,   172,   176,   180,   184,   194,   211,
+     212,   216,   217,   224,   242,   246
 };
 #endif
 
@@ -1373,46 +1373,52 @@ yyreduce:
             fprintf(stderr, "Error: Predicate %s not declared\n", (yyvsp[-3].str));
             entry = symbolTable;
         }
+        // Validate arity of predicate
+        int arg_count = count_arguments((yyvsp[-1].node));
+        validate_arity(entry, arg_count);
+        
         (yyval.node) = create_predicate_node(entry, (yyvsp[-1].node));
         free((yyvsp[-3].str));
     }
-#line 1380 "parser.c"
+#line 1384 "parser.c"
     break;
 
   case 29: /* term_list_opt: term_list  */
-#line 207 "parser.y"
+#line 211 "parser.y"
               { (yyval.node) = (yyvsp[0].node); }
-#line 1386 "parser.c"
+#line 1390 "parser.c"
     break;
 
   case 30: /* term_list_opt: %empty  */
-#line 208 "parser.y"
+#line 212 "parser.y"
       { (yyval.node) = NULL; }
-#line 1392 "parser.c"
+#line 1396 "parser.c"
     break;
 
   case 31: /* term_list: term  */
-#line 212 "parser.y"
+#line 216 "parser.y"
          { (yyval.node) = (yyvsp[0].node); }
-#line 1398 "parser.c"
+#line 1402 "parser.c"
     break;
 
   case 32: /* term_list: term_list COMMA term  */
-#line 213 "parser.y"
+#line 217 "parser.y"
                            { 
         // Link terms together in argument list using ARGLIST binary nodes
         (yyval.node) = create_binary_node(OP_ARGLIST, (yyvsp[-2].node), (yyvsp[0].node));
     }
-#line 1407 "parser.c"
+#line 1411 "parser.c"
     break;
 
   case 33: /* term: STRING  */
-#line 220 "parser.y"
+#line 224 "parser.y"
            {
         fprintf(stderr, "PAR: TERM: Variable/Constant %s\n", (yyvsp[0].str));
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[0].str));
         if (entry && strcmp(entry->type, "function") == 0) {
             // It's a function (even if arity is 0)
+            // Validate that it's called with 0 arguments
+            validate_arity(entry, 0);
             (yyval.node) = create_function_node(entry, NULL);
         } else if (entry) {
             (yyval.node) = create_variable_node(entry);
@@ -1424,20 +1430,20 @@ yyreduce:
         }
         free((yyvsp[0].str));
     }
-#line 1428 "parser.c"
+#line 1434 "parser.c"
     break;
 
   case 34: /* term: INT  */
-#line 236 "parser.y"
+#line 242 "parser.y"
         {
         fprintf(stderr, "PAR: TERM: Constant %d\n", (yyvsp[0].val));
         (yyval.node) = create_number_node((yyvsp[0].val));
     }
-#line 1437 "parser.c"
+#line 1443 "parser.c"
     break;
 
   case 35: /* term: STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE  */
-#line 240 "parser.y"
+#line 246 "parser.y"
                                                     {
         fprintf(stderr, "PAR: TERM: Function %s(...)\n", (yyvsp[-3].str));
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[-3].str));
@@ -1445,14 +1451,18 @@ yyreduce:
             addSymbolEntry(&symbolTable, (yyvsp[-3].str), "unknown", 0);
             entry = getSymbolEntry(symbolTable, (yyvsp[-3].str));
         }
+        // Validate arity of function
+        int arg_count = count_arguments((yyvsp[-1].node));
+        validate_arity(entry, arg_count);
+        
         (yyval.node) = create_function_node(entry, (yyvsp[-1].node));
         free((yyvsp[-3].str));
     }
-#line 1452 "parser.c"
+#line 1462 "parser.c"
     break;
 
 
-#line 1456 "parser.c"
+#line 1466 "parser.c"
 
       default: break;
     }
@@ -1645,7 +1655,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 252 "parser.y"
+#line 262 "parser.y"
 
 
 void yyerror(const char *s){

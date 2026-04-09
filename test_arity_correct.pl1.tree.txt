@@ -1,0 +1,7 @@
+STP: ----- Start Syntax Tree Printout. -----
+STP: Predicate: p
+STP: .Variable: a
+STP: .Function: f
+STP: ..Variable: b
+STP: ..Variable: a
+STP: ----- End of Syntax Tree Printout. -----

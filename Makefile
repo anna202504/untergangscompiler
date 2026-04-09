@@ -28,7 +28,7 @@ scanner.c:	scanner.l
 
 # Pattern Rule für die Generierung von Syntax-Tree-Dateien
 Input_folder/%_in.pl1.tree.txt: Input_folder/%_in.pl1 pl1c
-	./pl1c $< > $@
+	@./pl1c $< > $@ 2>/dev/null
 
 
 #error.o:	debug.h error.h

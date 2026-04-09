@@ -16,4 +16,6 @@ struct tableEntry *getSymbolEntry(struct tableEntry *head, const char *identifie
 
 void clearSymbolTable(struct tableEntry **head);
 
+void validate_arity(struct tableEntry *entry, int actual_count);
+
 #endif // SYMBOL_TABLE_H

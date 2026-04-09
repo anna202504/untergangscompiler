@@ -1,0 +1,6 @@
+/* Test file to verify function arity validation */
+DECLARE PREDICATE p : 1
+DECLARE FUNCTION f : 1
+DECLARE VARIABLE a : int
+
+p(f(a, a));

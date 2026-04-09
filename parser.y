@@ -198,6 +198,10 @@ atom:
             fprintf(stderr, "Error: Predicate %s not declared\n", $1);
             entry = symbolTable;
         }
+        // Validate arity of predicate
+        int arg_count = count_arguments($3);
+        validate_arity(entry, arg_count);
+        
         $$ = create_predicate_node(entry, $3);
         free($1);
     }
@@ -222,6 +226,8 @@ term:
         struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
         if (entry && strcmp(entry->type, "function") == 0) {
             // It's a function (even if arity is 0)
+            // Validate that it's called with 0 arguments
+            validate_arity(entry, 0);
             $$ = create_function_node(entry, NULL);
         } else if (entry) {
             $$ = create_variable_node(entry);
@@ -244,6 +250,10 @@ term:
             addSymbolEntry(&symbolTable, $1, "unknown", 0);
             entry = getSymbolEntry(symbolTable, $1);
         }
+        // Validate arity of function
+        int arg_count = count_arguments($3);
+        validate_arity(entry, arg_count);
+        
         $$ = create_function_node(entry, $3);
         free($1);
     }
