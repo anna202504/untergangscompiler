@@ -79,8 +79,11 @@ struct node
 struct node *makeNode(int nodeType);
 struct node *copyNode(struct node *originalNode);
 void deleteNode(struct node *node);
+int getArgumentCount(struct node *arguments);
 
 void printNode(struct node *node, int indentLevel);
+int countArguments(struct node *head);
+int getArgumentCount(struct node *head);
 
 
 

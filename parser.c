@@ -145,18 +145,6 @@ static struct tableEntry *findSymbolEntrySilent(struct tableEntry *head, const c
     return NULL;
 }
 
-static int countArgumentNodes(struct node *head)
-{
-    int count = 0;
-    struct node *current = head;
-    while (current != NULL)
-    {
-        count++;
-        current = current->next;
-    }
-    return count;
-}
-
 int yylex(void);
 void yyerror (const char *s);
 extern FILE *yyin; 
@@ -182,7 +170,7 @@ extern FILE *yyin;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 40 "parser.y"
+#line 28 "parser.y"
 {
     char* str;
     int val;
@@ -190,7 +178,7 @@ typedef union YYSTYPE
     char id[101];
 }
 /* Line 193 of yacc.c.  */
-#line 194 "parser.c"
+#line 182 "parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -203,7 +191,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 207 "parser.c"
+#line 195 "parser.c"
 
 #ifdef short
 # undef short
@@ -501,10 +489,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    79,    79,    79,    84,    95,    95,   101,   111,   121,
-     137,   141,   142,   154,   155,   167,   168,   180,   181,   193,
-     194,   205,   212,   219,   220,   245,   270,   274,   299,   300,
-     304,   305,   316,   333,   341
+       0,    67,    67,    67,    72,    83,    83,    89,    99,   109,
+     125,   129,   130,   142,   143,   155,   156,   168,   169,   181,
+     182,   193,   200,   207,   208,   235,   260,   264,   296,   297,
+     301,   302,   313,   330,   338
 };
 #endif
 
@@ -1447,7 +1435,7 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 84 "parser.y"
+#line 72 "parser.y"
     {
         if (astRoot != NULL)
             deleteNode(astRoot);
@@ -1459,7 +1447,7 @@ yyreduce:
     break;
 
   case 7:
-#line 101 "parser.y"
+#line 89 "parser.y"
     {
             fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].val));
             if(findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str))){
@@ -1473,7 +1461,7 @@ yyreduce:
     break;
 
   case 8:
-#line 111 "parser.y"
+#line 99 "parser.y"
     {
             fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].val));            
             if(findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str))){
@@ -1487,7 +1475,7 @@ yyreduce:
     break;
 
   case 9:
-#line 121 "parser.y"
+#line 109 "parser.y"
     {
             fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].str));
             if(findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str))){
@@ -1503,17 +1491,17 @@ yyreduce:
     break;
 
   case 10:
-#line 137 "parser.y"
+#line 125 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 11:
-#line 141 "parser.y"
+#line 129 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 12:
-#line 142 "parser.y"
+#line 130 "parser.y"
     {
         fprintf(stderr,"PAR: JUNCTOR: EQUIV\n");
         (yyval.p) = makeNode(BType);
@@ -1526,12 +1514,12 @@ yyreduce:
     break;
 
   case 13:
-#line 154 "parser.y"
+#line 142 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 14:
-#line 155 "parser.y"
+#line 143 "parser.y"
     {
         fprintf(stderr,"PAR: JUNCTOR: IMPLICATION\n");
         (yyval.p) = makeNode(BType);
@@ -1544,12 +1532,12 @@ yyreduce:
     break;
 
   case 15:
-#line 167 "parser.y"
+#line 155 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 16:
-#line 168 "parser.y"
+#line 156 "parser.y"
     {
         fprintf(stderr,"PAR: JUNCTOR: OR\n");
         (yyval.p) = makeNode(BType);
@@ -1562,12 +1550,12 @@ yyreduce:
     break;
 
   case 17:
-#line 180 "parser.y"
+#line 168 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 18:
-#line 181 "parser.y"
+#line 169 "parser.y"
     {
         fprintf(stderr,"PAR: JUNCTOR: AND\n");
         (yyval.p) = makeNode(BType);
@@ -1580,12 +1568,12 @@ yyreduce:
     break;
 
   case 19:
-#line 193 "parser.y"
+#line 181 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 20:
-#line 194 "parser.y"
+#line 182 "parser.y"
     {
         fprintf(stderr,"PAR: JUNCTOR: NOT\n");
         (yyval.p) = makeNode(UType);
@@ -1597,7 +1585,7 @@ yyreduce:
     break;
 
   case 21:
-#line 205 "parser.y"
+#line 193 "parser.y"
     {
         fprintf(stderr,"PAR: CONST: TRUE\n");
         (yyval.p) = makeNode(BooType);
@@ -1608,7 +1596,7 @@ yyreduce:
     break;
 
   case 22:
-#line 212 "parser.y"
+#line 200 "parser.y"
     {
         fprintf(stderr,"PAR: CONST: FALSE\n");
         (yyval.p) = makeNode(BooType);
@@ -1619,12 +1607,12 @@ yyreduce:
     break;
 
   case 23:
-#line 219 "parser.y"
+#line 207 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 24:
-#line 220 "parser.y"
+#line 208 "parser.y"
     {
         fprintf(stderr,"PAR: QUANTOR: ALL %s\n",(yyvsp[(3) - (5)].str)); 
         struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str));
@@ -1643,6 +1631,8 @@ yyreduce:
 
         varNode->vType.symbolTableEntry = entry;
         fprintf(stderr, "SYT: Variable Node created\n");
+
+        
         qNode->qType.quantorOperator = FORALL;
         qNode->qType.quantorVariable = varNode;
         qNode->qType.quantorBody = (yyvsp[(5) - (5)].p);
@@ -1653,7 +1643,7 @@ yyreduce:
     break;
 
   case 25:
-#line 245 "parser.y"
+#line 235 "parser.y"
     {
         fprintf(stderr,"PAR: QUANTOR: EXIST %s\n",(yyvsp[(3) - (5)].str)); 
         struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(3) - (5)].str));
@@ -1682,20 +1672,27 @@ yyreduce:
     break;
 
   case 26:
-#line 270 "parser.y"
+#line 260 "parser.y"
     { (yyval.p) = (yyvsp[(2) - (3)].p); ;}
     break;
 
   case 27:
-#line 274 "parser.y"
+#line 264 "parser.y"
     {
         fprintf(stderr, "PAR: ATOM: %s()\n", (yyvsp[(1) - (4)].str));
         struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(1) - (4)].str));
-        int argCount = countArgumentNodes((yyvsp[(3) - (4)].p));
+        int argCount = getArgumentCount((yyvsp[(3) - (4)].p));
         if (!entry)
-            yyerror("Predicate not declared");
-        else if (entry->arity != argCount)
-            yyerror("Predicate arity mismatch");
+        {
+            fprintf(stderr, "Error: Predicate '%s' not declared\n", (yyvsp[(1) - (4)].str));
+            exit(1);
+        }
+        if (entry->arity != argCount)
+        {
+            fprintf(stderr, "Error: Predicate '%s' arity mismatch (declared=%d, found=%d)\n",
+                    (yyvsp[(1) - (4)].str), entry->arity, argCount);
+            exit(1);
+        }
 
         (yyval.p) = makeNode(PType);
         if (!(yyval.p))
@@ -1713,22 +1710,22 @@ yyreduce:
     break;
 
   case 28:
-#line 299 "parser.y"
+#line 296 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 29:
-#line 300 "parser.y"
+#line 297 "parser.y"
     { (yyval.p) = NULL; ;}
     break;
 
   case 30:
-#line 304 "parser.y"
+#line 301 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 31:
-#line 305 "parser.y"
+#line 302 "parser.y"
     {
         struct node *last = (yyvsp[(1) - (3)].p);
         while (last->next != NULL)
@@ -1740,7 +1737,7 @@ yyreduce:
     break;
 
   case 32:
-#line 316 "parser.y"
+#line 313 "parser.y"
     {
         fprintf(stderr, "PAR: TERM: Variable/Constant %s\n", (yyvsp[(1) - (1)].str));
         struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(1) - (1)].str));
@@ -1761,7 +1758,7 @@ yyreduce:
     break;
 
   case 33:
-#line 333 "parser.y"
+#line 330 "parser.y"
     {
         fprintf(stderr, "PAR: TERM: Constant %d\n", (yyvsp[(1) - (1)].val));
         (yyval.p) = makeNode(NType);
@@ -1773,15 +1770,22 @@ yyreduce:
     break;
 
   case 34:
-#line 341 "parser.y"
+#line 338 "parser.y"
     {
         fprintf(stderr, "PAR: TERM: Function %s(...)\n", (yyvsp[(1) - (4)].str));
         struct tableEntry *entry = findSymbolEntrySilent(symbolTable, (yyvsp[(1) - (4)].str));
-        int argCount = countArgumentNodes((yyvsp[(3) - (4)].p));
+        int argCount = getArgumentCount((yyvsp[(3) - (4)].p));
         if (!entry)
-            yyerror("Function not declared");
-        else if (entry->arity != argCount)
-            yyerror("Function arity mismatch");
+        {
+            fprintf(stderr, "Error: Function '%s' not declared\n", (yyvsp[(1) - (4)].str));
+            exit(1);
+        }
+        if (entry->arity != argCount)
+        {
+            fprintf(stderr, "Error: Function '%s' arity mismatch (declared=%d, found=%d)\n",
+                    (yyvsp[(1) - (4)].str), entry->arity, argCount);
+            exit(1);
+        }
 
         (yyval.p) = makeNode(FType);
         if (!(yyval.p))
@@ -1801,7 +1805,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1805 "parser.c"
+#line 1809 "parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2015,7 +2019,7 @@ yyreturn:
 }
 
 
-#line 369 "parser.y"
+#line 373 "parser.y"
 
 
 void yyerror(const char *s){

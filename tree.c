@@ -2,6 +2,18 @@
 #include <stdlib.h>
 #include "tree.h"
 
+int countArguments(struct node *head)
+{
+    int count = 0;
+    struct node *cur = head;
+    while (cur != NULL) {
+        count++;
+        cur = cur->next;
+    }
+    return count;
+}
+
+
 struct node *makeNode(int nodeType)
 {
     struct node *newNode = malloc(sizeof(struct node));
@@ -107,6 +119,20 @@ void deleteNode(struct node *node)
     deleteNode(node->next);
 
     free(node);
+}
+
+int getArgumentCount(struct node *arguments)
+{
+    int count = 0;
+    struct node *current = arguments;
+
+    while (current != NULL)
+    {
+        count++;
+        current = current->next;
+    }
+
+    return count;
 }
 
 static void printIndent(int indentLevel)

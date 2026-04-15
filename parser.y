@@ -20,18 +20,6 @@ static struct tableEntry *findSymbolEntrySilent(struct tableEntry *head, const c
     return NULL;
 }
 
-static int countArgumentNodes(struct node *head)
-{
-    int count = 0;
-    struct node *current = head;
-    while (current != NULL)
-    {
-        count++;
-        current = current->next;
-    }
-    return count;
-}
-
 int yylex(void);
 void yyerror (const char *s);
 extern FILE *yyin; 
@@ -235,6 +223,8 @@ quant_or_atom:
 
         varNode->vType.symbolTableEntry = entry;
         fprintf(stderr, "SYT: Variable Node created\n");
+
+        
         qNode->qType.quantorOperator = FORALL;
         qNode->qType.quantorVariable = varNode;
         qNode->qType.quantorBody = $5;
@@ -274,11 +264,18 @@ atom:
     STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE {
         fprintf(stderr, "PAR: ATOM: %s()\n", $1);
         struct tableEntry *entry = findSymbolEntrySilent(symbolTable, $1);
-        int argCount = countArgumentNodes($3);
+        int argCount = getArgumentCount($3);
         if (!entry)
-            yyerror("Predicate not declared");
-        else if (entry->arity != argCount)
-            yyerror("Predicate arity mismatch");
+        {
+            fprintf(stderr, "Error: Predicate '%s' not declared\n", $1);
+            exit(1);
+        }
+        if (entry->arity != argCount)
+        {
+            fprintf(stderr, "Error: Predicate '%s' arity mismatch (declared=%d, found=%d)\n",
+                    $1, entry->arity, argCount);
+            exit(1);
+        }
 
         $$ = makeNode(PType);
         if (!$$)
@@ -341,11 +338,18 @@ term:
   | STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE {
         fprintf(stderr, "PAR: TERM: Function %s(...)\n", $1);
         struct tableEntry *entry = findSymbolEntrySilent(symbolTable, $1);
-        int argCount = countArgumentNodes($3);
+        int argCount = getArgumentCount($3);
         if (!entry)
-            yyerror("Function not declared");
-        else if (entry->arity != argCount)
-            yyerror("Function arity mismatch");
+        {
+            fprintf(stderr, "Error: Function '%s' not declared\n", $1);
+            exit(1);
+        }
+        if (entry->arity != argCount)
+        {
+            fprintf(stderr, "Error: Function '%s' arity mismatch (declared=%d, found=%d)\n",
+                    $1, entry->arity, argCount);
+            exit(1);
+        }
 
         $$ = makeNode(FType);
         if (!$$)

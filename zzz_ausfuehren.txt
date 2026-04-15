@@ -1,0 +1,6 @@
+
+im richtigen Ordner 
+
+make clean 
+make 
+./pl1c Input_folder/complex_in.pl1
