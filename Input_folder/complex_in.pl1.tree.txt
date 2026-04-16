@@ -2,7 +2,7 @@ STP: ----- Start Syntax Tree Printout. -----
 STP: EQUIVALENT
 STP: .IMPLICATION
 STP: ..AND
-STP: ...ALL
+STP: ...AND
 STP: ....Variable: x
 STP: ....NOT
 STP: .....OR
@@ -14,18 +14,18 @@ STP: ...Predicate: P2
 STP: ....Number: 1
 STP: ..NOT
 STP: ...AND
-STP: ....ALL
+STP: ....AND
 STP: .....Variable: z
-STP: .....EXIST
+STP: .....AND
 STP: ......Variable: y
 STP: ......NOT
 STP: .......Predicate: P3
-STP: ........Function: c
-STP: ........Function: f
-STP: .........Variable: z
-STP: ........Function: g
-STP: .........Number: 13
-STP: .........Variable: y
+.................STP: ..........Function: c
+STP: ..........Function: f
+STP: ...........Variable: z
+STP: .........Function: g
+..........STP: ...........Number: 13
+STP: ...........Variable: y
 STP: ....TRUE
 STP: .NOT
 STP: ..FALSE

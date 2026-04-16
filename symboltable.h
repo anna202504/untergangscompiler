@@ -1,3 +1,5 @@
+struct tableEntry* readSymbolTableFromFile(FILE *in);
+struct tableEntry* cloneSymbolTable(struct tableEntry *original);
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
@@ -17,5 +19,7 @@ struct tableEntry *getSymbolEntry(struct tableEntry *head, const char *identifie
 void clearSymbolTable(struct tableEntry **head);
 
 void validate_arity(struct tableEntry *entry, int actual_count);
+
+void printSymbolTable(FILE *out, struct tableEntry *head);
 
 #endif // SYMBOL_TABLE_H

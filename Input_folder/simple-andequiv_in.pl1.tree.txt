@@ -1,7 +1,6 @@
-STP: ----- Start Syntax Tree Printout. -----
-STP: EQUIVALENT
-STP: .AND
-STP: ..Predicate: A
-STP: ..Predicate: B
-STP: .Predicate: C
-STP: ----- End of Syntax Tree Printout. -----
+Symbol Table:
+Identifier: C, Type: predicate, Arity: 0
+Identifier: B, Type: predicate, Arity: 0
+Identifier: A, Type: predicate, Arity: 0
+------------------
+ree Printout. -----

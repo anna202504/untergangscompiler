@@ -1,5 +1,5 @@
-STP: ----- Start Syntax Tree Printout. -----
-STP: EQUIVALENT
-STP: .Predicate: A
-STP: .Predicate: B
-STP: ----- End of Syntax Tree Printout. -----
+Symbol Table:
+Identifier: B, Type: predicate, Arity: 0
+Identifier: A, Type: predicate, Arity: 0
+------------------
+f Syntax Tree Printout. -----

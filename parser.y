@@ -75,7 +75,6 @@ input:
 block:
     declarations formula SEMICOLON {
         fprintf(stderr, "PAR: SEMICOLON\n");
-        // Formula zur Liste hinzufügen (behalte die globale Symbolentabelle für alle Blöcke)
         struct formula_list *new_entry = (struct formula_list *)malloc(sizeof(struct formula_list));
         new_entry->tree = $2;
         new_entry->next = formulas;
@@ -170,12 +169,17 @@ quant_or_atom:
     }
     | atom { $$ = $1; }
     | ALL SQUARE_BRACKET_OPEN variable_ref SQUARE_BRACKET_CLOSE not_formula {
-        fprintf(stderr,"PAR: QUANTOR: ALL\n");
+        fprintf(stderr,"PAR: QUANTOR: ALL (Bildstruktur)\n");
+        struct node *varnode = create_var_node($3);
         $$ = create_quantor_node(OP_FORALL, $3, $5);
+        // Bildstruktur: q_all(var, formula) -> mit explizitem var-Knoten
+        $$ = create_binary_node(OP_AND, varnode, $5); /* Dummy, falls du q_all explizit willst, sonst nur varnode erzeugen */
     }
     | EXIST SQUARE_BRACKET_OPEN variable_ref SQUARE_BRACKET_CLOSE not_formula {
-        fprintf(stderr,"PAR: QUANTOR: EXIST\n");
+        fprintf(stderr,"PAR: QUANTOR: EXIST (Bildstruktur)\n");
+        struct node *varnode = create_var_node($3);
         $$ = create_quantor_node(OP_EXISTS, $3, $5);
+        $$ = create_binary_node(OP_AND, varnode, $5); /* Dummy, falls du q_exist explizit willst */
     }
     | BRACKET_OPEN formula BRACKET_CLOSE { $$ = $2; }
 ;
@@ -192,17 +196,16 @@ variable_ref:
 
 atom:
     STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE {
-        fprintf(stderr, "PAR: ATOM: %s()\n", $1);
+        fprintf(stderr, "PAR: ATOM: %s() (Bildstruktur)\n", $1);
         struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
         if (!entry) {
             fprintf(stderr, "Error: Predicate %s not declared\n", $1);
             entry = symbolTable;
         }
-        // Validate arity of predicate
         int arg_count = count_arguments($3);
         validate_arity(entry, arg_count);
-        
-        $$ = create_predicate_node(entry, $3);
+        struct node *args = $3;
+        $$ = create_pred_node(entry, args);
         free($1);
     }
 ;
@@ -214,28 +217,25 @@ term_list_opt:
 
 term_list:
     term { $$ = $1; }
-    | term_list COMMA term { 
-        // Link terms together in argument list using ARGLIST binary nodes
-        $$ = create_binary_node(OP_ARGLIST, $1, $3);
+    | term_list COMMA term {
+        // Bildstruktur: Argumente als arg-Kette
+        $$ = create_arg_node($1, $3);
     }
 ;
 
 term:
     STRING {
-        fprintf(stderr, "PAR: TERM: Variable/Constant %s\n", $1);
+        fprintf(stderr, "PAR: TERM: Variable/Constant %s (Bildstruktur)\n", $1);
         struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
         if (entry && strcmp(entry->type, "function") == 0) {
-            // It's a function (even if arity is 0)
-            // Validate that it's called with 0 arguments
             validate_arity(entry, 0);
-            $$ = create_function_node(entry, NULL);
+            $$ = create_func_node(entry, NULL);
         } else if (entry) {
-            $$ = create_variable_node(entry);
+            $$ = create_var_node(entry);
         } else {
-            // Try to create a variable node anyway
             addSymbolEntry(&symbolTable, $1, "unknown", 0);
             entry = getSymbolEntry(symbolTable, $1);
-            $$ = create_variable_node(entry);
+            $$ = create_var_node(entry);
         }
         free($1);
     }
@@ -244,17 +244,16 @@ term:
         $$ = create_number_node($1);
     }
   | STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE {
-        fprintf(stderr, "PAR: TERM: Function %s(...)\n", $1);
+        fprintf(stderr, "PAR: TERM: Function %s(...) (Bildstruktur)\n", $1);
         struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
         if (!entry) {
             addSymbolEntry(&symbolTable, $1, "unknown", 0);
             entry = getSymbolEntry(symbolTable, $1);
         }
-        // Validate arity of function
         int arg_count = count_arguments($3);
         validate_arity(entry, arg_count);
-        
-        $$ = create_function_node(entry, $3);
+        struct node *args = $3;
+        $$ = create_func_node(entry, args);
         free($1);
     }
 ;
@@ -304,6 +303,9 @@ int main(int argc, char *argv[]){
         free(current);
         current = next;
     }
+
+    // Symboltabelle am Ende auf stdout ausgeben (nur Symboltabelle auf stdout!)
+    printSymbolTable(stdout, symbolTable);
     
     // Gebe die Symbolentabelle am Ende frei
     clearSymbolTable(&symbolTable);

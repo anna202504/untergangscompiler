@@ -1,3 +1,10 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "tree.h"
+#include "symboltable.h"
+
+// ...existing code...
 // Neue Knoten für explizite Baumstruktur (wie im Bild)
 struct node* create_arg_node(struct node *left, struct node *right) {
     struct node *n = malloc(sizeof(struct node));
@@ -214,7 +221,7 @@ void print_tree(FILE *out, struct node *tree, int depth) {
                 print_tree(out, tree->types.functionType.arguments, depth + 1);
             break;
     }
-    }
+    
 }
 
 void free_tree(struct node *tree) {
@@ -255,35 +262,35 @@ int count_arguments(struct node *args) {
     if (!args) {
         return 0;
     }
-    
-    if (args->nodeType != NODE_BINARY || args->types.binaryType.op != OP_ARGLIST) {
-        // Single argument (not an ARGLIST node)
-        return 1;
-    }
-    
-    // Count arguments in the OP_ARGLIST chain
-    // The structure is: ARGLIST(left, right)
-    // where right is either another ARGLIST or the last argument
-    // We need to recursively count the left side and the right side
-    
-    int count = 1; // count the right side as one argument
-    struct node *current = args;
-    
-    while (current != NULL && current->nodeType == NODE_BINARY && 
-           current->types.binaryType.op == OP_ARGLIST) {
-        // The left side could be another ARGLIST or a single argument
-        struct node *left = current->types.binaryType.left;
-        
-        if (left && left->nodeType == NODE_BINARY && left->types.binaryType.op == OP_ARGLIST) {
-            // Left is another ARGLIST, so we move to it
-            count++; // count one more argument for the right side of this ARGLIST
-            current = left;
-        } else {
-            // Left is a single argument (not an ARGLIST)
-            count++; // count the left argument
-            break;
+    // ARGLIST-Kette (alt)
+    if (args->nodeType == NODE_BINARY && args->types.binaryType.op == OP_ARGLIST) {
+        int count = 1;
+        struct node *current = args;
+        while (current != NULL && current->nodeType == NODE_BINARY && current->types.binaryType.op == OP_ARGLIST) {
+            struct node *left = current->types.binaryType.left;
+            if (left && left->nodeType == NODE_BINARY && left->types.binaryType.op == OP_ARGLIST) {
+                count++;
+                current = left;
+            } else {
+                count++;
+                break;
+            }
         }
+        return count;
     }
-    
-    return count;
+    // Neue arg-Kette (NODE_ARG)
+    if (args->nodeType == NODE_ARG) {
+        int count = 0;
+        struct node *current = args;
+        while (current != NULL && current->nodeType == NODE_ARG) {
+            if (current->types.binaryType.left)
+                count += count_arguments(current->types.binaryType.left);
+            current = current->types.binaryType.right;
+        }
+        if (current)
+            count += count_arguments(current);
+        return count;
+    }
+    // Einzelnes Argument
+    return 1;
 }

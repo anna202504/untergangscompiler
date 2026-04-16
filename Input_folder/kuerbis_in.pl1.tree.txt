@@ -1,54 +1,46 @@
-STP: ----- Start Syntax Tree Printout. -----
-STP: AND
-STP: .AND
-STP: ..AND
-STP: ...EXIST
-STP: ....Variable: x
-STP: ....AND
-STP: .....Predicate: Kauft
-STP: ......Function: Tim
-STP: ......Variable: x
-STP: .....Predicate: Kuerbis
-STP: ......Variable: x
-STP: ...ALL
-STP: ....Variable: x
-STP: ....ALL
-STP: .....Variable: y
-STP: .....IMPLICATION
-STP: ......AND
-STP: .......Predicate: Kauft
-STP: ........Variable: x
-STP: ........Variable: y
+Symbol Table:
+Identifier: y, Type: int, Arity: 0
+Identifier: x, Type: int, Arity: 0
+Identifier: Tim, Type: function, Arity: 0
+Identifier: Schnitzt, Type: predicate, Arity: 2
+Identifier: Isst, Type: predicate, Arity: 2
+Identifier: Kind, Type: predicate, Arity: 1
+Identifier: Kuerbis, Type: predicate, Arity: 1
+Identifier: Kauft, Type: predicate, Arity: 2
+------------------
+Predicate: Kauft
+........STP: .........Variable: x
+STP: .........Variable: y
 STP: .......Predicate: Kuerbis
 STP: ........Variable: y
 STP: ......OR
 STP: .......Predicate: Isst
-STP: ........Variable: x
-STP: ........Variable: y
+........STP: .........Variable: x
+STP: .........Variable: y
 STP: .......Predicate: Schnitzt
-STP: ........Variable: x
-STP: ........Variable: y
-STP: ..ALL
+........STP: .........Variable: x
+STP: .........Variable: y
+STP: ..AND
 STP: ...Variable: x
 STP: ...IMPLICATION
 STP: ....Predicate: Kind
 STP: .....Variable: x
-STP: ....ALL
+STP: ....AND
 STP: .....Variable: y
 STP: .....IMPLICATION
 STP: ......Predicate: Kuerbis
 STP: .......Variable: y
 STP: ......NOT
 STP: .......Predicate: Isst
-STP: ........Variable: x
-STP: ........Variable: y
+........STP: .........Variable: x
+STP: .........Variable: y
 STP: .NOT
 STP: ..IMPLICATION
 STP: ...Predicate: Kind
 STP: ....Function: Tim
-STP: ...EXIST
+STP: ...AND
 STP: ....Variable: x
 STP: ....Predicate: Schnitzt
-STP: .....Function: Tim
-STP: .....Variable: x
+.....STP: ......Function: Tim
+STP: ......Variable: x
 STP: ----- End of Syntax Tree Printout. -----

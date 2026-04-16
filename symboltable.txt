@@ -1,0 +1,11 @@
+Symbol Table:
+Identifier: z, Type: int, Arity: 0
+Identifier: y, Type: int, Arity: 0
+Identifier: x, Type: int, Arity: 0
+Identifier: g, Type: function, Arity: 2
+Identifier: f, Type: function, Arity: 1
+Identifier: c, Type: function, Arity: 0
+Identifier: P3, Type: predicate, Arity: 3
+Identifier: P2, Type: predicate, Arity: 1
+Identifier: P1, Type: predicate, Arity: 0
+------------------

@@ -1,19 +1,16 @@
-STP: ----- Start Syntax Tree Printout. -----
-STP: ALL
-STP: .Variable: x
-STP: .ALL
-STP: ..Variable: y
-STP: ..ALL
-STP: ...Variable: z
-STP: ...IMPLICATION
-STP: ....AND
+Symbol Table:
+Identifier: z, Type: int, Arity: 0
+Identifier: y, Type: int, Arity: 0
+Identifier: x, Type: int, Arity: 0
+Identifier: R, Type: predicate, Arity: 2
+------------------
+icate: R
+......STP: .......Variable: x
+STP: .......Variable: y
 STP: .....Predicate: R
-STP: ......Variable: x
-STP: ......Variable: y
-STP: .....Predicate: R
-STP: ......Variable: y
-STP: ......Variable: z
+......STP: .......Variable: y
+STP: .......Variable: z
 STP: ....Predicate: R
-STP: .....Variable: x
-STP: .....Variable: z
+.....STP: ......Variable: x
+STP: ......Variable: z
 STP: ----- End of Syntax Tree Printout. -----

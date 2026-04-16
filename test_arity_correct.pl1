@@ -1,7 +1,0 @@
-/* Test file to verify correct arity validation */
-DECLARE PREDICATE p : 2
-DECLARE FUNCTION f : 2
-DECLARE VARIABLE a : int
-DECLARE VARIABLE b : int
-
-p(a, f(b, a));

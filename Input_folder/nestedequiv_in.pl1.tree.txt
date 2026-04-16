@@ -1,15 +1,14 @@
-STP: ----- Start Syntax Tree Printout. -----
-STP: EQUIVALENT
-STP: .EQUIVALENT
-STP: ..ALL
+Symbol Table:
+Identifier: x, Type: int, Arity: 0
+Identifier: Q, Type: predicate, Arity: 1
+Identifier: P, Type: predicate, Arity: 1
+------------------
+
+STP: ..AND
 STP: ...Variable: x
 STP: ...Predicate: P
 STP: ....Variable: x
-STP: ..EXIST
-STP: ...Variable: x
-STP: ...Predicate: P
-STP: ....Variable: x
-STP: .ALL
+STP: .AND
 STP: ..Variable: x
 STP: ..EQUIVALENT
 STP: ...Predicate: Q

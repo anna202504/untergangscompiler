@@ -7,7 +7,7 @@
 #*                                            *
 #**********************************************
 
-objects = parser.o scanner.o symboltable.o tree.o #error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
+objects = parser.o scanner.o symboltable.o tree.o#error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
 CC	= gcc
 LEX	= flex
 YACC	= bison
@@ -40,7 +40,7 @@ scanner.o: parser.h
 #optimize.o:	debug.h error.h optimize.h syntaxtree.h symboltable.h
 #generate.o:	debug.h error.h generate.h syntaxtree.h symboltable.h
 #parser.o:	debug.h error.h parser.h process.h symboltable.h syntaxtree.h 
-parser.o:	parser.h symboltable.h 
+parser.o:	parser.h symboltable.h
 #process.o:	debug.h error.h process.h optimize.h generate.h syntaxtree.h symboltable.h
 #main.o:		debug.h error.h parser.h generate.h process.h syntaxtree.h symboltable.h
 #parser.h:	parser.y
@@ -48,3 +48,6 @@ parser.o:	parser.h symboltable.h
 
 clean:
 	rm pl1c parser.c scanner.c parser.h $(objects) $(TREE_FILES)
+
+klammer: klammer.o symboltable.o
+	$(CC) -o $@ klammer.o symboltable.o

@@ -1,7 +1,6 @@
-STP: ----- Start Syntax Tree Printout. -----
-STP: IMPLICATION
-STP: .NOT
-STP: ..NOT
-STP: ...Predicate: P
-STP: .Predicate: Q
+Symbol Table:
+Identifier: Q, Type: predicate, Arity: 0
+Identifier: P, Type: predicate, Arity: 0
+------------------
+cate: Q
 STP: ----- End of Syntax Tree Printout. -----

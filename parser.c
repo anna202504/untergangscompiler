@@ -552,10 +552,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    66,    66,    70,    76,    88,    88,    94,   100,   105,
-     119,   123,   124,   131,   132,   139,   140,   147,   148,   155,
-     156,   163,   167,   171,   172,   176,   180,   184,   194,   211,
-     212,   216,   217,   224,   242,   246
+       0,    66,    66,    70,    76,    87,    87,    93,    99,   104,
+     118,   122,   123,   130,   131,   138,   139,   146,   147,   154,
+     155,   162,   166,   170,   171,   178,   184,   188,   198,   214,
+     215,   219,   220,   227,   242,   246
 };
 #endif
 
@@ -1177,39 +1177,38 @@ yyreduce:
 #line 76 "parser.y"
                                    {
         fprintf(stderr, "PAR: SEMICOLON\n");
-        // Formula zur Liste hinzufügen (behalte die globale Symbolentabelle für alle Blöcke)
         struct formula_list *new_entry = (struct formula_list *)malloc(sizeof(struct formula_list));
         new_entry->tree = (yyvsp[-1].node);
         new_entry->next = formulas;
         formulas = new_entry;
         (yyval.node) = (yyvsp[-1].node);
     }
-#line 1188 "parser.c"
+#line 1187 "parser.c"
     break;
 
   case 7: /* declaration: DECLARE PREDICATE STRING COLON INT  */
-#line 94 "parser.y"
+#line 93 "parser.y"
                                            {
             fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", (yyvsp[-2].str), (yyvsp[0].val));
             addSymbolEntry(&symbolTable, (yyvsp[-2].str), "predicate", (yyvsp[0].val));
             free((yyvsp[-2].str));
 
         }
-#line 1199 "parser.c"
+#line 1198 "parser.c"
     break;
 
   case 8: /* declaration: DECLARE FUNCTION STRING COLON INT  */
-#line 100 "parser.y"
+#line 99 "parser.y"
                                             {
             fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", (yyvsp[-2].str), (yyvsp[0].val));
             addSymbolEntry(&symbolTable, (yyvsp[-2].str), "function", (yyvsp[0].val));
             free((yyvsp[-2].str));
         }
-#line 1209 "parser.c"
+#line 1208 "parser.c"
     break;
 
   case 9: /* declaration: DECLARE VARIABLE STRING COLON STRING  */
-#line 105 "parser.y"
+#line 104 "parser.y"
                                                {
             fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", (yyvsp[-2].str), (yyvsp[0].str));
             if (getSymbolEntry(symbolTable, (yyvsp[-2].str))) {
@@ -1220,140 +1219,145 @@ yyreduce:
             }
             free((yyvsp[-2].str)); free((yyvsp[0].str));
         }
-#line 1224 "parser.c"
+#line 1223 "parser.c"
     break;
 
   case 10: /* formula: equiv_formula  */
-#line 119 "parser.y"
+#line 118 "parser.y"
                   { (yyval.node) = (yyvsp[0].node); }
-#line 1230 "parser.c"
+#line 1229 "parser.c"
     break;
 
   case 11: /* equiv_formula: implies_formula  */
-#line 123 "parser.y"
+#line 122 "parser.y"
                       { (yyval.node) = (yyvsp[0].node); }
-#line 1236 "parser.c"
+#line 1235 "parser.c"
     break;
 
   case 12: /* equiv_formula: equiv_formula EQUIV implies_formula  */
-#line 124 "parser.y"
+#line 123 "parser.y"
                                           { 
         fprintf(stderr,"PAR: JUNCTOR: EQUIV\n"); 
         (yyval.node) = create_binary_node(OP_EQUIV, (yyvsp[-2].node), (yyvsp[0].node));
     }
-#line 1245 "parser.c"
+#line 1244 "parser.c"
     break;
 
   case 13: /* implies_formula: or_formula  */
-#line 131 "parser.y"
+#line 130 "parser.y"
                  { (yyval.node) = (yyvsp[0].node); }
-#line 1251 "parser.c"
+#line 1250 "parser.c"
     break;
 
   case 14: /* implies_formula: implies_formula IMPLIES or_formula  */
-#line 132 "parser.y"
+#line 131 "parser.y"
                                          { 
         fprintf(stderr,"PAR: JUNCTOR: IMPLICATION\n"); 
         (yyval.node) = create_binary_node(OP_IMPLIES, (yyvsp[-2].node), (yyvsp[0].node));
     }
-#line 1260 "parser.c"
+#line 1259 "parser.c"
     break;
 
   case 15: /* or_formula: and_formula  */
-#line 139 "parser.y"
+#line 138 "parser.y"
                   { (yyval.node) = (yyvsp[0].node); }
-#line 1266 "parser.c"
+#line 1265 "parser.c"
     break;
 
   case 16: /* or_formula: or_formula OR and_formula  */
-#line 140 "parser.y"
+#line 139 "parser.y"
                                 { 
         fprintf(stderr,"PAR: JUNCTOR: OR\n"); 
         (yyval.node) = create_binary_node(OP_OR, (yyvsp[-2].node), (yyvsp[0].node));
     }
-#line 1275 "parser.c"
+#line 1274 "parser.c"
     break;
 
   case 17: /* and_formula: not_formula  */
-#line 147 "parser.y"
+#line 146 "parser.y"
                   { (yyval.node) = (yyvsp[0].node); }
-#line 1281 "parser.c"
+#line 1280 "parser.c"
     break;
 
   case 18: /* and_formula: and_formula AND not_formula  */
-#line 148 "parser.y"
+#line 147 "parser.y"
                                   { 
         fprintf(stderr,"PAR: JUNCTOR: AND\n"); 
         (yyval.node) = create_binary_node(OP_AND, (yyvsp[-2].node), (yyvsp[0].node));
     }
-#line 1290 "parser.c"
+#line 1289 "parser.c"
     break;
 
   case 19: /* not_formula: quant_or_atom  */
-#line 155 "parser.y"
+#line 154 "parser.y"
                     { (yyval.node) = (yyvsp[0].node); }
-#line 1296 "parser.c"
+#line 1295 "parser.c"
     break;
 
   case 20: /* not_formula: NOT not_formula  */
-#line 156 "parser.y"
+#line 155 "parser.y"
                       { 
         fprintf(stderr,"PAR: JUNCTOR: NOT\n"); 
         (yyval.node) = create_unary_node(OP_NOT, (yyvsp[0].node));
     }
-#line 1305 "parser.c"
+#line 1304 "parser.c"
     break;
 
   case 21: /* quant_or_atom: TRUE  */
-#line 163 "parser.y"
+#line 162 "parser.y"
            { 
         fprintf(stderr,"PAR: CONST: TRUE\n"); 
         (yyval.node) = create_bool_node(true);
     }
-#line 1314 "parser.c"
+#line 1313 "parser.c"
     break;
 
   case 22: /* quant_or_atom: FALSE  */
-#line 167 "parser.y"
+#line 166 "parser.y"
             { 
         fprintf(stderr,"PAR: CONST: FALSE\n"); 
         (yyval.node) = create_bool_node(false);
     }
-#line 1323 "parser.c"
+#line 1322 "parser.c"
     break;
 
   case 23: /* quant_or_atom: atom  */
-#line 171 "parser.y"
+#line 170 "parser.y"
            { (yyval.node) = (yyvsp[0].node); }
-#line 1329 "parser.c"
+#line 1328 "parser.c"
     break;
 
   case 24: /* quant_or_atom: ALL SQUARE_BRACKET_OPEN variable_ref SQUARE_BRACKET_CLOSE not_formula  */
-#line 172 "parser.y"
+#line 171 "parser.y"
                                                                             {
-        fprintf(stderr,"PAR: QUANTOR: ALL\n");
+        fprintf(stderr,"PAR: QUANTOR: ALL (Bildstruktur)\n");
+        struct node *varnode = create_var_node((yyvsp[-2].entry));
         (yyval.node) = create_quantor_node(OP_FORALL, (yyvsp[-2].entry), (yyvsp[0].node));
+        // Bildstruktur: q_all(var, formula) -> mit explizitem var-Knoten
+        (yyval.node) = create_binary_node(OP_AND, varnode, (yyvsp[0].node)); /* Dummy, falls du q_all explizit willst, sonst nur varnode erzeugen */
     }
-#line 1338 "parser.c"
+#line 1340 "parser.c"
     break;
 
   case 25: /* quant_or_atom: EXIST SQUARE_BRACKET_OPEN variable_ref SQUARE_BRACKET_CLOSE not_formula  */
-#line 176 "parser.y"
+#line 178 "parser.y"
                                                                               {
-        fprintf(stderr,"PAR: QUANTOR: EXIST\n");
+        fprintf(stderr,"PAR: QUANTOR: EXIST (Bildstruktur)\n");
+        struct node *varnode = create_var_node((yyvsp[-2].entry));
         (yyval.node) = create_quantor_node(OP_EXISTS, (yyvsp[-2].entry), (yyvsp[0].node));
+        (yyval.node) = create_binary_node(OP_AND, varnode, (yyvsp[0].node)); /* Dummy, falls du q_exist explizit willst */
     }
-#line 1347 "parser.c"
+#line 1351 "parser.c"
     break;
 
   case 26: /* quant_or_atom: BRACKET_OPEN formula BRACKET_CLOSE  */
-#line 180 "parser.y"
+#line 184 "parser.y"
                                          { (yyval.node) = (yyvsp[-1].node); }
-#line 1353 "parser.c"
+#line 1357 "parser.c"
     break;
 
   case 27: /* variable_ref: STRING  */
-#line 184 "parser.y"
+#line 188 "parser.y"
            {
         (yyval.entry) = getSymbolEntry(symbolTable, (yyvsp[0].str));
         if (!(yyval.entry)) {
@@ -1361,72 +1365,68 @@ yyreduce:
         }
         free((yyvsp[0].str));
     }
-#line 1365 "parser.c"
+#line 1369 "parser.c"
     break;
 
   case 28: /* atom: STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE  */
-#line 194 "parser.y"
+#line 198 "parser.y"
                                                     {
-        fprintf(stderr, "PAR: ATOM: %s()\n", (yyvsp[-3].str));
+        fprintf(stderr, "PAR: ATOM: %s() (Bildstruktur)\n", (yyvsp[-3].str));
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[-3].str));
         if (!entry) {
             fprintf(stderr, "Error: Predicate %s not declared\n", (yyvsp[-3].str));
             entry = symbolTable;
         }
-        // Validate arity of predicate
         int arg_count = count_arguments((yyvsp[-1].node));
         validate_arity(entry, arg_count);
-        
-        (yyval.node) = create_predicate_node(entry, (yyvsp[-1].node));
+        struct node *args = (yyvsp[-1].node);
+        (yyval.node) = create_pred_node(entry, args);
         free((yyvsp[-3].str));
     }
-#line 1384 "parser.c"
+#line 1387 "parser.c"
     break;
 
   case 29: /* term_list_opt: term_list  */
-#line 211 "parser.y"
+#line 214 "parser.y"
               { (yyval.node) = (yyvsp[0].node); }
-#line 1390 "parser.c"
+#line 1393 "parser.c"
     break;
 
   case 30: /* term_list_opt: %empty  */
-#line 212 "parser.y"
+#line 215 "parser.y"
       { (yyval.node) = NULL; }
-#line 1396 "parser.c"
+#line 1399 "parser.c"
     break;
 
   case 31: /* term_list: term  */
-#line 216 "parser.y"
+#line 219 "parser.y"
          { (yyval.node) = (yyvsp[0].node); }
-#line 1402 "parser.c"
+#line 1405 "parser.c"
     break;
 
   case 32: /* term_list: term_list COMMA term  */
-#line 217 "parser.y"
-                           { 
-        // Link terms together in argument list using ARGLIST binary nodes
-        (yyval.node) = create_binary_node(OP_ARGLIST, (yyvsp[-2].node), (yyvsp[0].node));
+#line 220 "parser.y"
+                           {
+        // Bildstruktur: Argumente als arg-Kette
+        (yyval.node) = create_arg_node((yyvsp[-2].node), (yyvsp[0].node));
     }
-#line 1411 "parser.c"
+#line 1414 "parser.c"
     break;
 
   case 33: /* term: STRING  */
-#line 224 "parser.y"
+#line 227 "parser.y"
            {
-        fprintf(stderr, "PAR: TERM: Variable/Constant %s\n", (yyvsp[0].str));
+        fprintf(stderr, "PAR: TERM: Variable/Constant %s (Bildstruktur)\n", (yyvsp[0].str));
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[0].str));
         if (entry && strcmp(entry->type, "function") == 0) {
-            // It's a function (even if arity is 0)
-            // Validate that it's called with 0 arguments
             validate_arity(entry, 0);
-            (yyval.node) = create_function_node(entry, NULL);
+            (yyval.node) = create_func_node(entry, NULL);
         } else if (entry) {
-            (yyval.node) = create_variable_node(entry);
+            (yyval.node) = create_var_node(entry);
         } else {
-            // Try to create a variable node anyway
             addSymbolEntry(&symbolTable, (yyvsp[0].str), "unknown", 0);
             entry = getSymbolEntry(symbolTable, (yyvsp[0].str));
-            (yyval.node) = create_variable_node(entry);
+            (yyval.node) = create_var_node(entry);
         }
         free((yyvsp[0].str));
     }
@@ -1445,24 +1445,23 @@ yyreduce:
   case 35: /* term: STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE  */
 #line 246 "parser.y"
                                                     {
-        fprintf(stderr, "PAR: TERM: Function %s(...)\n", (yyvsp[-3].str));
+        fprintf(stderr, "PAR: TERM: Function %s(...) (Bildstruktur)\n", (yyvsp[-3].str));
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[-3].str));
         if (!entry) {
             addSymbolEntry(&symbolTable, (yyvsp[-3].str), "unknown", 0);
             entry = getSymbolEntry(symbolTable, (yyvsp[-3].str));
         }
-        // Validate arity of function
         int arg_count = count_arguments((yyvsp[-1].node));
         validate_arity(entry, arg_count);
-        
-        (yyval.node) = create_function_node(entry, (yyvsp[-1].node));
+        struct node *args = (yyvsp[-1].node);
+        (yyval.node) = create_func_node(entry, args);
         free((yyvsp[-3].str));
     }
-#line 1462 "parser.c"
+#line 1461 "parser.c"
     break;
 
 
-#line 1466 "parser.c"
+#line 1465 "parser.c"
 
       default: break;
     }
@@ -1655,7 +1654,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 262 "parser.y"
+#line 261 "parser.y"
 
 
 void yyerror(const char *s){
@@ -1701,6 +1700,9 @@ int main(int argc, char *argv[]){
         free(current);
         current = next;
     }
+
+    // Symboltabelle am Ende auf stdout ausgeben (nur Symboltabelle auf stdout!)
+    printSymbolTable(stdout, symbolTable);
     
     // Gebe die Symbolentabelle am Ende frei
     clearSymbolTable(&symbolTable);

@@ -1,19 +1,15 @@
-STP: ----- Start Syntax Tree Printout. -----
-STP: IMPLICATION
-STP: .OR
-STP: ..OR
-STP: ...AND
-STP: ....AND
-STP: .....Predicate: A
-STP: .....NOT
-STP: ......Predicate: B
-STP: ....NOT
-STP: .....Predicate: C
+Symbol Table:
+Identifier: x, Type: int, Arity: 0
+Identifier: C, Type: predicate, Arity: 0
+Identifier: B, Type: predicate, Arity: 0
+Identifier: A, Type: predicate, Arity: 0
+------------------
+redicate: C
 STP: ...AND
 STP: ....Predicate: A
 STP: ....NOT
 STP: .....Predicate: B
-STP: ..ALL
+STP: ..AND
 STP: ...Variable: x
 STP: ...NOT
 STP: ....Predicate: A
