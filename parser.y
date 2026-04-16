@@ -51,6 +51,8 @@ input:
 
 block:
     declarations formula SEMICOLON { 
+        fprintf(stderr, "PAR: Formula completed with Semicolon.\n");
+        
         fprintf(stderr, "\n----- New Block Parsed -----\n"); 
 
         fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
@@ -75,7 +77,7 @@ declaration:
         struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
         if (entry != NULL) {
             if (strcmp(entry->type, "predicate") != 0 || entry->arity != $5) {
-                fprintf(stderr, "ERROR: Identifier %s already declared with different type or arity\n", $3);
+                fprintf(stderr, "ERROR: Identifier %s already declared with different type\n", $3);
             exit(1);
             }
         } else {
@@ -88,7 +90,7 @@ declaration:
         struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
         if (entry != NULL) {
             if (strcmp(entry->type, "function") != 0 || entry->arity != $5) {
-                fprintf(stderr, "ERROR: Identifier %s already declared with different type or arity\n", $3);
+                fprintf(stderr, "ERROR: Identifier %s already declared with different type\n", $3);
             exit(1);
             }
         } else {
@@ -105,7 +107,7 @@ declaration:
         struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
         if (entry != NULL) {
             if (strcmp(entry->type, "variable") != 0) {
-                fprintf(stderr, "ERROR: Identifier %s already declared with different type or arity\n", $3);
+                fprintf(stderr, "ERROR: Identifier %s already declared with different type\n", $3);
             exit(1);
             }
         } else {
@@ -121,59 +123,59 @@ formula:
 equiv_formula:
       implies_formula { $$ = $1; }
     | equiv_formula EQUIV implies_formula { 
-        fprintf(stderr,"PAR: JUNCTOR: EQUIV\n"); 
+        fprintf(stderr,"PAR: Formula reduced - JUNCTOR: EQUIVALENT\n"); 
         $$ = makeNode(NODE_BINARY_OPERATOR);
         $$->treeTypes.binaryType.left = $1;
         $$->treeTypes.binaryType.right = $3;
         $$->treeTypes.binaryType.operatorType = BINOP_IFF;
-        fprintf(stderr, "SYT: Binary Node created - Type IFF\n");
+        fprintf(stderr, "SYT: Binary Node created - Type <->\n");
     }
 ;
 
 implies_formula:
       or_formula { $$ = $1; }
     | implies_formula IMPLIES or_formula { 
-        fprintf(stderr,"PAR: JUNCTOR: IMPLICATION\n"); 
+        fprintf(stderr,"PAR: Formula reduced - JUNCTOR: IMPLICATION\n"); 
         $$ = makeNode(NODE_BINARY_OPERATOR);
         $$->treeTypes.binaryType.left = $1;
         $$->treeTypes.binaryType.right = $3;
         $$->treeTypes.binaryType.operatorType = BINOP_IMPLIES;
-        fprintf(stderr, "SYT: Binary Node created - Type IMPLIES\n");
+        fprintf(stderr, "SYT: Binary Node created - Type ->\n");
     }
 ;
 
 or_formula:
       and_formula { $$ = $1; }
     | or_formula OR and_formula { 
-        fprintf(stderr,"PAR: JUNCTOR: OR\n"); 
+        fprintf(stderr,"PAR: Formula reduced - JUNCTOR: OR\n"); 
         $$ = makeNode(NODE_BINARY_OPERATOR);
         $$->treeTypes.binaryType.left = $1;
         $$->treeTypes.binaryType.right = $3;
         $$->treeTypes.binaryType.operatorType = BINOP_OR;
-        fprintf(stderr, "SYT: Binary Node created - Type OR\n");
+        fprintf(stderr, "SYT: Binary Node created - Type |\n");
     }
 ;
 
 and_formula:
       not_formula { $$ = $1; }
     | and_formula AND not_formula { 
-        fprintf(stderr,"PAR: JUNCTOR: AND\n"); 
+        fprintf(stderr,"PAR: Formula reduced - JUNCTOR: AND\n"); 
         $$ = makeNode(NODE_BINARY_OPERATOR);
         $$->treeTypes.binaryType.left = $1;
         $$->treeTypes.binaryType.right = $3;
         $$->treeTypes.binaryType.operatorType = BINOP_AND;
-        fprintf(stderr, "SYT: Binary Node created - Type AND\n");
+        fprintf(stderr, "SYT: Binary Node created - Type &\n");
     }
 ;
 
 not_formula:
       quant_or_atom { $$ = $1; }
     | NOT not_formula { 
-        fprintf(stderr,"PAR: JUNCTOR: NOT\n"); 
+        fprintf(stderr,"PAR: Formula reduced - JUNCTOR: NEGATION\n"); 
         $$ = makeNode(NODE_UNARY_OPERATOR);
         $$->treeTypes.unaryType.child = $2;
         $$->treeTypes.unaryType.operatorType = UOP_NOT;
-        fprintf(stderr, "SYT: Unary Node created - Type NOT\n");
+        fprintf(stderr, "SYT: Unary Node created - Type ~\n");
     }
 ;
 
@@ -181,12 +183,14 @@ quant_or_atom:
       TRUE { 
         $$ = makeNode(NODE_BOOL);
         $$->treeTypes.boolType.value = 1;
-        fprintf(stderr,"SYT: Bool Node created (TRUE)\nPAR: CONST: TRUE\n"); 
+        fprintf(stderr, "PAR: Formula reduced - ATOM: TRUE\n");
+        fprintf(stderr,"SYT: TRUE Node created\n"); 
       }
     | FALSE { 
         $$ = makeNode(NODE_BOOL);
         $$->treeTypes.boolType.value = 0;
-        fprintf(stderr,"SYT: Bool Node created (FALSE)\nPAR: CONST: FALSE\n"); 
+        fprintf(stderr, "PAR: Formula reduced - ATOM: FALSE\n");
+        fprintf(stderr,"SYT: FALSE Node created\n"); 
       }
     | atom { $$ = $1; }
     | ALL SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula {
@@ -205,8 +209,9 @@ quant_or_atom:
             $$->treeTypes.quantorType.var = entry;
             $$->treeTypes.quantorType.formula = $5;
 
-            fprintf(stderr, "SYT: Quantor Node created - FORALL %s\n", $3);
-            fprintf(stderr, "PAR: QUANTOR: ALL %s\n", $3);
+            fprintf(stderr, "PAR: Formula reduced - QUANTOR: ALL %s\n", $3);
+            fprintf(stderr, "SYT: Variable Node created\n");
+            fprintf(stderr, "SYT: Quantor Node created - Type ALL\n");
         }
     | EXIST SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula {
         struct tableEntry *entry = getSymbolEntry(symbolTable, $3);
@@ -224,8 +229,9 @@ quant_or_atom:
         $$->treeTypes.quantorType.var = entry;
         $$->treeTypes.quantorType.formula = $5;
 
-        fprintf(stderr, "SYT: Quantor Node created - EXISTS %s\n", $3);
-        fprintf(stderr,"PAR: QUANTOR: EXIST %s\n",$3); 
+        fprintf(stderr,"PAR: Formula reduced - QUANTOR: EXIST %s\n",$3); 
+        fprintf(stderr, "SYT: Variable Node created\n");
+        fprintf(stderr,"SYT: Quantor Node created - Type EXIST\n"); 
     }
     | BRACKET_OPEN formula BRACKET_CLOSE { $$ = $2; }
 ;
@@ -251,7 +257,9 @@ atom:
         $$ = makeNode(NODE_PREDICATE);
         $$->treeTypes.predicatType.entry = entry;
         $$->treeTypes.predicatType.arguments = $3;
-        fprintf(stderr, "SYT: Predicate Node created - %s\nPAR: ATOM: %s()\n", $1, $1);
+        fprintf(stderr, "PAR: Formula reduced - ATOM: %s() - %d arguments\n", $1, argCount);
+        fprintf(stderr, "SYT: Predicate Node created - %s\n", $1);
+        
     }
 ;
 
@@ -261,12 +269,14 @@ term_list_opt:
 ;
 
 term_list:
-    term { $$ = $1; }
+    term { $$ = $1; 
+    fprintf(stderr, "SYT: Argument Node created\n"); 
+    }
     | term_list COMMA term {
         struct treeNode *last = $1;
         while(last->next) last = last->next;
         last->next = $3;
-        $$ = $1;
+        $$ = $1; 
         fprintf(stderr, "SYT: Argument Node added to list\n");
     }
 ;
@@ -280,6 +290,7 @@ term:
         }
 
         if(strcmp(entry->type, "variable") == 0) {
+            fprintf(stderr, "PAR: TERM: Variable/Constant %s\n", $1);
             $$ = makeNode(NODE_VARIABLE);
             $$->treeTypes.variableType.entry = entry;
             fprintf(stderr, "SYT: Variable Node created - %s\n", $1);
@@ -289,6 +300,7 @@ term:
                 exit(1);
             }
 
+            fprintf(stderr, "PAR: TERM: Variable/Constant %s\n", $1);
             $$ = makeNode(NODE_FUNCTION);
             $$->treeTypes.functionType.entry = entry;
             $$->treeTypes.functionType.arguments = NULL;
@@ -299,9 +311,10 @@ term:
         }
     }
   | INT {
+        fprintf(stderr, "PAR: TERM: Number: %d\n", $1);
         $$ = makeNode(NODE_NUMBER);
         $$->treeTypes.numberType.value = $1;
-        fprintf(stderr, "SYT: Number Node created - %d\nPAR: TERM: Constant %d\n", $1, $1);
+        fprintf(stderr, "SYT: Number Node created - %d\n", $1);
     }
   | STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE {
         struct tableEntry *entry = getSymbolEntry(symbolTable, $1);
@@ -320,10 +333,11 @@ term:
             exit(1);
         }
 
+        fprintf(stderr, "PAR: TERM: Function %s() - %d arguments\n", $1, argCount);
         $$ = makeNode(NODE_FUNCTION);
         $$->treeTypes.functionType.entry = entry;
         $$->treeTypes.functionType.arguments = $3;
-        fprintf(stderr, "SYT: Function Node created - %s(...)\nPAR: TERM: Function %s(...)\n", $1, $1);
+        fprintf(stderr, "SYT: Function Node created - %s(...)\n", $1);
     }
 ;
 

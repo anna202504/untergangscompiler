@@ -7,7 +7,7 @@
 #*                                            *
 #**********************************************
 
-objects = parser.o scanner.o symbol_table.o tree.o #error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
+objects = parser.o scanner.o symbol_table.o tree.o klammer.o #error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
 CC	= gcc
 LEX	= flex
 YACC	= bison
