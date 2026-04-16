@@ -43,26 +43,24 @@
      PREDICATE = 259,
      FUNCTION = 260,
      VARIABLE = 261,
-     ID = 262,
-     EXIST = 263,
-     ALL = 264,
-     TRUE = 265,
-     FALSE = 266,
-     AND = 267,
-     OR = 268,
-     NOT = 269,
-     IMPLIES = 270,
-     EQUIV = 271,
-     BRACKET_OPEN = 272,
-     BRACKET_CLOSE = 273,
-     SQUARE_BRACKET_OPEN = 274,
-     SQUARE_BRACKET_CLOSE = 275,
-     COMMA = 276,
-     COLON = 277,
-     SEMICOLON = 278,
-     DIGIT = 279,
-     INT = 280,
-     STRING = 281
+     EXIST = 262,
+     ALL = 263,
+     TRUE = 264,
+     FALSE = 265,
+     AND = 266,
+     OR = 267,
+     NOT = 268,
+     IMPLIES = 269,
+     EQUIV = 270,
+     BRACKET_OPEN = 271,
+     BRACKET_CLOSE = 272,
+     SQUARE_BRACKET_OPEN = 273,
+     SQUARE_BRACKET_CLOSE = 274,
+     COMMA = 275,
+     COLON = 276,
+     SEMICOLON = 277,
+     INT = 278,
+     STRING = 279
    };
 #endif
 /* Tokens.  */
@@ -70,41 +68,39 @@
 #define PREDICATE 259
 #define FUNCTION 260
 #define VARIABLE 261
-#define ID 262
-#define EXIST 263
-#define ALL 264
-#define TRUE 265
-#define FALSE 266
-#define AND 267
-#define OR 268
-#define NOT 269
-#define IMPLIES 270
-#define EQUIV 271
-#define BRACKET_OPEN 272
-#define BRACKET_CLOSE 273
-#define SQUARE_BRACKET_OPEN 274
-#define SQUARE_BRACKET_CLOSE 275
-#define COMMA 276
-#define COLON 277
-#define SEMICOLON 278
-#define DIGIT 279
-#define INT 280
-#define STRING 281
+#define EXIST 262
+#define ALL 263
+#define TRUE 264
+#define FALSE 265
+#define AND 266
+#define OR 267
+#define NOT 268
+#define IMPLIES 269
+#define EQUIV 270
+#define BRACKET_OPEN 271
+#define BRACKET_CLOSE 272
+#define SQUARE_BRACKET_OPEN 273
+#define SQUARE_BRACKET_CLOSE 274
+#define COMMA 275
+#define COLON 276
+#define SEMICOLON 277
+#define INT 278
+#define STRING 279
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 28 "parser.y"
+#line 16 "parser.y"
 {
     char* str;
     int val;
-    struct node *p; 
+    struct treeNode *p;
     char id[101];
 }
 /* Line 1529 of yacc.c.  */
-#line 108 "parser.h"
+#line 104 "parser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

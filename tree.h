@@ -1,90 +1,89 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include "symboltable.h"
-#include <stdbool.h>
+#include "symbol_table.h"
 
-enum nodeType {PType, FType, VType, QType, BType, UType, BooType, NType};
+enum NodeType {
+    NODE_QUANTOR,
+    NODE_BINARY_OPERATOR,
+    NODE_UNARY_OPERATOR,
+    NODE_PREDICATE,
+    NODE_FUNCTION,
+    NODE_VARIABLE,
+    NODE_NUMBER,
+    NODE_BOOL
+};
 
-enum quantorOp {FORALL, EXISTS};
-enum binaryOp {B_AND, B_OR, B_IMPLIES, B_EQUIV};
-enum unaryOp {U_NOT};
+enum QuantorType {
+    FORALL,
+    EXISTS
+};
+
+enum BinaryOperatorType {
+    BINOP_AND,
+    BINOP_OR,
+    BINOP_IMPLIES,
+    BINOP_IFF
+};
+
+enum UnaryOperatorType {
+    UOP_NOT
+};
 
 
-struct node 
-{
-
-    int nodeType; 
-    union
-    {
-
+struct treeNode {
+    int nodeType;
+    struct treeNode *next;
+    union {
         struct qType
         {
-            enum quantorOp quantorOperator;
-            struct node *quantorVariable;
-            struct node *quantorBody;
-        } qType;
-
-
+            enum QuantorType quantorType;
+            struct tableEntry *var;
+            struct treeNode *formula;
+        }  quantorType;
         struct bType
         {
-            enum binaryOp binaryOperator;
-            struct node *leftnode; 
-            struct node *rightnode;
-
-        } bType;   
-         
+            struct treeNode *left;
+            struct treeNode *right;
+            enum BinaryOperatorType operatorType;
+        } binaryType;
         struct uType
         {
-            enum unaryOp unaryOperator;
-            struct node *operand;
-        } uType;       
-        
+            struct treeNode *child;
+            enum UnaryOperatorType operatorType;
+        } unaryType;
         struct pType
         {
-            struct tableEntry *symbolTableEntry;
-            struct node *arguments;
-        } pType;
+            struct tableEntry *entry;
+            struct treeNode *arguments;
 
-
+        } predicatType;
         struct fType
         {
-          struct tableEntry *symbolTableEntry; 
-                    struct node *arguments;
-        } fType;
-
+            struct tableEntry *entry;
+            struct treeNode *arguments;
+        } functionType;
         struct vType
         {
-            struct tableEntry *symbolTableEntry;
-        } vType;
-
-        struct booType
-        {
-            bool value;
-        } booType;
-
+            struct tableEntry *entry;
+        } variableType;
         struct nType
         {
             int value;
-        } nType;
-
- 
-    };
-
-    struct node *next;
+        } numberType;
+        struct booType
+        {
+            int value;
+        } boolType;
     
-
-
+    } treeTypes;
 };
-struct node *makeNode(int nodeType);
-struct node *copyNode(struct node *originalNode);
-void deleteNode(struct node *node);
-int getArgumentCount(struct node *arguments);
 
-void printNode(struct node *node, int indentLevel);
-int countArguments(struct node *head);
-int getArgumentCount(struct node *head);
+struct treeNode *makeNode(int nodeType);
+struct treeNode *copyTree(struct treeNode *root);
+struct treeNode *deleteTree(struct treeNode *root);
+void printTree(struct treeNode *root, int level);
 
+int countArguments(struct treeNode *argList);
 
-
-#endif
+#endif // TREE_H

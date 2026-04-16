@@ -1,232 +1,214 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "tree.h"
+#include  <stdio.h>
+#include  <stdlib.h>
+#include  "tree.h"
 
-int countArguments(struct node *head)
-{
-    int count = 0;
-    struct node *cur = head;
-    while (cur != NULL) {
-        count++;
-        cur = cur->next;
+struct treeNode *makeNode(int nodeType) {
+    struct treeNode *newNode = malloc(sizeof(struct treeNode));
+    if (newNode == NULL) {
+        fprintf(stderr, "Error: Memory allocation failed for new tree node.\n");
+        exit(EXIT_FAILURE);
     }
-    return count;
-}
-
-
-struct node *makeNode(int nodeType)
-{
-    struct node *newNode = malloc(sizeof(struct node));
-    if (!newNode)
-        return NULL;
 
     newNode->nodeType = nodeType;
     newNode->next = NULL;
+
+    switch (nodeType) {
+        case NODE_QUANTOR: 
+            fprintf(stderr, "Creating node type %d\n", nodeType);
+            break;
+        case NODE_BINARY_OPERATOR: 
+            fprintf(stderr, "Creating node type %d\n", nodeType);
+            break;
+        case NODE_UNARY_OPERATOR: 
+            fprintf(stderr, "Creating node type %d\n", nodeType);
+            break;
+        case NODE_PREDICATE: 
+            fprintf(stderr, "Creating node type %d\n", nodeType);
+            break;
+        case NODE_FUNCTION   : 
+            fprintf(stderr, "Creating node type %d\n", nodeType);
+            break;
+        case NODE_VARIABLE: 
+            fprintf(stderr, "Creating node type %d\n", nodeType);
+            break;
+        case NODE_NUMBER: 
+            fprintf(stderr, "Creating node type %d\n", nodeType);
+            break;
+        case NODE_BOOL: 
+            fprintf(stderr, "Creating node type %d\n", nodeType);
+            break;
+        default:
+            fprintf(stderr, "Error: Invalid node type %d.\n", nodeType);
+            free(newNode);
+            exit(EXIT_FAILURE);
+        }
     return newNode;
 }
 
-struct node *copyNode(struct node *originalNode)
-{
-    if (originalNode == NULL)
+
+struct treeNode *deleteTree(struct treeNode *root) {
+    if (root == NULL) {
         return NULL;
-
-    struct node *copy = makeNode(originalNode->nodeType);
-    if (!copy)
-        return NULL;
-
-    switch (originalNode->nodeType)
-    {
-        case QType:
-            copy->qType.quantorOperator = originalNode->qType.quantorOperator;
-            copy->qType.quantorVariable = copyNode(originalNode->qType.quantorVariable);
-            copy->qType.quantorBody = copyNode(originalNode->qType.quantorBody);
-            break;
-
-        case BType:
-            copy->bType.binaryOperator = originalNode->bType.binaryOperator;
-            copy->bType.leftnode = copyNode(originalNode->bType.leftnode);
-            copy->bType.rightnode = copyNode(originalNode->bType.rightnode);
-            break;
-
-        case UType:
-            copy->uType.unaryOperator = originalNode->uType.unaryOperator;
-            copy->uType.operand = copyNode(originalNode->uType.operand);
-            break;
-
-        case PType:
-            copy->pType.symbolTableEntry = originalNode->pType.symbolTableEntry;
-            copy->pType.arguments = copyNode(originalNode->pType.arguments);
-            break;
-
-        case FType:
-            copy->fType.symbolTableEntry = originalNode->fType.symbolTableEntry;
-            copy->fType.arguments = copyNode(originalNode->fType.arguments);
-            break;
-
-        case VType:
-            copy->vType.symbolTableEntry = originalNode->vType.symbolTableEntry;
-            break;
-
-        case BooType:
-            copy->booType.value = originalNode->booType.value;
-            break;
-
-        case NType:
-            copy->nType.value = originalNode->nType.value;
-            break;
     }
 
-    copy->next = copyNode(originalNode->next);
+    switch (root->nodeType) {
+        case NODE_QUANTOR: 
+            deleteTree(root->treeTypes.quantorType.formula);
+            break;
+        case NODE_BINARY_OPERATOR:
+            deleteTree(root->treeTypes.binaryType.left);
+            deleteTree(root->treeTypes.binaryType.right);
+            break;
+        case NODE_UNARY_OPERATOR: 
+            deleteTree(root->treeTypes.unaryType.child);
+            break;
+        case NODE_PREDICATE: 
+            deleteTree(root->treeTypes.predicatType.arguments);
+            break;
+        case NODE_FUNCTION: 
+            deleteTree(root->treeTypes.functionType.arguments);
+            break;
+        default:
+            break; // Variable, Number, Bool have no children
+    }
 
-    return copy;
+    deleteTree(root->next);
+
+    free(root);
+    return NULL;
 }
 
-void deleteNode(struct node *node)
-{
-    if (node == NULL)
+void printTree(struct treeNode *root, int level) {
+    if (root == NULL) {
         return;
-
-    switch (node->nodeType)
-    {
-        case QType:
-            deleteNode(node->qType.quantorVariable);
-            deleteNode(node->qType.quantorBody);
-            break;
-
-        case BType:
-            deleteNode(node->bType.leftnode);
-            deleteNode(node->bType.rightnode);
-            break;
-
-        case UType:
-            deleteNode(node->uType.operand);
-            break;
-
-        case PType:
-            deleteNode(node->pType.arguments);
-            break;
-
-        case FType:
-            deleteNode(node->fType.arguments);
-            break;
-
-        case VType:
-        case BooType:
-        case NType:
-            break;
     }
 
-    deleteNode(node->next);
+    fprintf(stderr, "STP: ");
+    for (int i = 0; i < level; i++) {
+        fprintf(stderr, ".");
+    }
 
-    free(node);
+    switch (root->nodeType) {
+        case NODE_QUANTOR: 
+            if (root->treeTypes.quantorType.quantorType == FORALL) {
+                fprintf(stderr, "ALL\n");
+            } else {
+                fprintf(stderr, "EXIST\n");
+            }
+            fprintf(stderr, "STP: ");
+            for (int i = 0; i <= level; i++) {
+                fprintf(stderr, ".");
+            }
+            fprintf(stderr, "Variable: %s\n", root->treeTypes.quantorType.var->identifier);
+            printTree(root->treeTypes.quantorType.formula, level + 1);
+            break;
+        case NODE_BINARY_OPERATOR:
+            switch (root->treeTypes.binaryType.operatorType) {
+                case BINOP_AND:
+                    fprintf(stderr, "AND\n");
+                    break;
+                case BINOP_OR:
+                    fprintf(stderr, "OR\n");
+                    break;
+                case BINOP_IMPLIES:
+                    fprintf(stderr, "IMPLICATION\n");
+                    break;
+                case BINOP_IFF:
+                    fprintf(stderr, "EQUIVALENT\n");
+                    break;
+                default:
+                    fprintf(stderr, "Error: Invalid binary operator type %d.\n", root->treeTypes.binaryType.operatorType);
+            }
+            printTree(root->treeTypes.binaryType.left, level + 1);
+            printTree(root->treeTypes.binaryType.right, level + 1);
+            break;
+        case NODE_UNARY_OPERATOR: 
+            switch (root->treeTypes.unaryType.operatorType) {
+                case UOP_NOT:
+                    fprintf(stderr, "NOT\n");
+                    break;
+                default:
+                    fprintf(stderr, "Error: Invalid unary operator type %d.\n", root->treeTypes.unaryType.operatorType);
+            }
+            printTree(root->treeTypes.unaryType.child, level + 1);
+            break;
+        case NODE_PREDICATE: 
+            fprintf(stderr, "Predicate: %s\n", root->treeTypes.predicatType.entry->identifier);
+            printTree(root->treeTypes.predicatType.arguments, level + 1);
+            break;
+        case NODE_FUNCTION: 
+            fprintf(stderr, "Function: %s\n", root->treeTypes.functionType.entry->identifier);
+            printTree(root->treeTypes.functionType.arguments, level + 1);
+            break;
+        case NODE_VARIABLE: 
+            fprintf(stderr, "Variable: %s\n", root->treeTypes.variableType.entry->identifier);
+            break;
+        case NODE_NUMBER: 
+            fprintf(stderr, "Number: %d\n", root->treeTypes.numberType.value);
+            break;
+        case NODE_BOOL: 
+            fprintf(stderr, "%s\n", root->treeTypes.boolType.value ? "TRUE" : "FALSE");
+            break;
+        default:
+            fprintf(stderr, "Error: Invalid node type %d.\n", root->nodeType);
+    }
+
+    printTree(root->next, level);
 }
 
-int getArgumentCount(struct node *arguments)
-{
-    int count = 0;
-    struct node *current = arguments;
+struct treeNode *copyTree(struct treeNode *root) {
+    if (root == NULL) {
+        return NULL;
+    }
 
-    while (current != NULL)
-    {
+    struct treeNode *newNode = makeNode(root->nodeType);
+    newNode->next = copyTree(root->next);
+
+    switch (root->nodeType) {
+        case NODE_QUANTOR: 
+            newNode->treeTypes.quantorType.var = root->treeTypes.quantorType.var; // Shallow copy
+            newNode->treeTypes.quantorType.formula = copyTree(root->treeTypes.quantorType.formula);
+            newNode->treeTypes.quantorType.quantorType = root->treeTypes.quantorType.quantorType;
+            break;
+        case NODE_BINARY_OPERATOR:
+            newNode->treeTypes.binaryType.left = copyTree(root->treeTypes.binaryType.left);
+            newNode->treeTypes.binaryType.right = copyTree(root->treeTypes.binaryType.right);
+            newNode->treeTypes.binaryType.operatorType = root->treeTypes.binaryType.operatorType;
+            break;
+        case NODE_UNARY_OPERATOR: 
+            newNode->treeTypes.unaryType.child = copyTree(root->treeTypes.unaryType.child);
+            newNode->treeTypes.unaryType.operatorType = root->treeTypes.unaryType.operatorType;
+            break;
+        case NODE_PREDICATE: 
+            newNode->treeTypes.predicatType.entry = root->treeTypes.predicatType.entry; // Shallow copy
+            newNode->treeTypes.predicatType.arguments = copyTree(root->treeTypes.predicatType.arguments);
+            break;
+        case NODE_FUNCTION: 
+            newNode->treeTypes.functionType.entry = root->treeTypes.functionType.entry; // Shallow copy
+            newNode->treeTypes.functionType.arguments = copyTree(root->treeTypes.functionType.arguments);
+            break;
+        case NODE_VARIABLE: 
+            newNode->treeTypes.variableType.entry = root->treeTypes.variableType.entry; // Shallow copy
+            break;
+        case NODE_NUMBER: 
+            newNode->treeTypes.numberType.value = root->treeTypes.numberType.value;
+            break;
+        case NODE_BOOL: 
+            newNode->treeTypes.boolType.value = root->treeTypes.boolType.value;
+            break;
+        default:
+            fprintf(stderr, "Error: Invalid node type %d.\n", root->nodeType);
+    }
+
+    return newNode;
+}
+
+int countArguments(struct treeNode *argList) {
+    int count = 0;
+    struct treeNode *current = argList;
+    while (current != NULL) {
         count++;
         current = current->next;
     }
-
     return count;
-}
-
-static void printIndent(int indentLevel)
-{
-    fprintf(stderr, "STP: ");
-    for (int i = 0; i < indentLevel; i++)
-        fputc('.', stderr);
-}
-
-static void printNodeList(struct node *node, int indentLevel)
-{
-    struct node *current = node;
-    while (current != NULL)
-    {
-        printNode(current, indentLevel);
-        current = current->next;
-    }
-}
-
-void printNode(struct node *node, int indentLevel)
-{
-    if (node == NULL)
-    {
-        printIndent(indentLevel);
-        fprintf(stderr, "NULL\n");
-        return;
-    }
-
-    printIndent(indentLevel);
-
-    switch (node->nodeType)
-    {
-        case QType:
-            fprintf(stderr, "%s\n",
-                    node->qType.quantorOperator == FORALL ? "ALL" : "EXIST");
-            printNode(node->qType.quantorVariable, indentLevel + 1);
-            printNode(node->qType.quantorBody, indentLevel + 1);
-            break;
-
-        case BType:
-            switch (node->bType.binaryOperator)
-            {
-                case B_AND:
-                    fprintf(stderr, "AND\n");
-                    break;
-                case B_OR:
-                    fprintf(stderr, "OR\n");
-                    break;
-                case B_IMPLIES:
-                    fprintf(stderr, "IMPLIES\n");
-                    break;
-                case B_EQUIV:
-                    fprintf(stderr, "EQUIV\n");
-                    break;
-                default:
-                    fprintf(stderr, "BINARY\n");
-                    break;
-            }
-            printNode(node->bType.leftnode, indentLevel + 1);
-            printNode(node->bType.rightnode, indentLevel + 1);
-            break;
-
-        case UType:
-            fprintf(stderr, "%s\n", node->uType.unaryOperator == U_NOT ? "NOT" : "UNARY");
-            printNode(node->uType.operand, indentLevel + 1);
-            break;
-
-        case PType:
-            fprintf(stderr, "Predicate: %s\n",
-                    node->pType.symbolTableEntry ? node->pType.symbolTableEntry->identifier : "<unknown>");
-            printNodeList(node->pType.arguments, indentLevel + 1);
-            break;
-
-        case FType:
-            fprintf(stderr, "Function: %s\n",
-                    node->fType.symbolTableEntry ? node->fType.symbolTableEntry->identifier : "<unknown>");
-            printNodeList(node->fType.arguments, indentLevel + 1);
-            break;
-
-        case VType:
-            fprintf(stderr, "Variable: %s\n",
-                    node->vType.symbolTableEntry ? node->vType.symbolTableEntry->identifier : "<unknown>");
-            break;
-
-        case BooType:
-            fprintf(stderr, "Boolean: %s\n", node->booType.value ? "TRUE" : "FALSE");
-            break;
-
-        case NType:
-            fprintf(stderr, "Number: %d\n", node->nType.value);
-            break;
-
-        default:
-            fprintf(stderr, "Unknown node type\n");
-            break;
-    }
 }
