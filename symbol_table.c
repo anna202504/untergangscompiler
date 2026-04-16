@@ -27,17 +27,17 @@ struct tableEntry *getSymbolEntry(struct tableEntry *head, char *identifier) {
 void printSymbolTable(struct tableEntry *head) {
     struct tableEntry *current = head;
 
-    printf("\n--- Symbol Table ---\n");
+    fprintf(stderr, "\n--- Symbol Table ---\n");
 
     while (current != NULL) {
-        printf("Identifier: %s | Type: %s | Arity: %d\n",
-               current->identifier,
-               current->type,
+        fprintf(stderr, "Identifier: %s | Type: %s | Arity: %d\n",
+                current->identifier,
+                current->type,
                current->arity);
         current = current->next;
     }
 
-    printf("---------------------\n");
+    fprintf(stderr, "---------------------\n");
 }
 
 void clearSymbolTable(struct tableEntry **head) {

@@ -4,6 +4,7 @@
 #include <string.h>
 #include "symbol_table.h"
 #include "tree.h"
+#include "klammer.h"
 
 struct tableEntry *symbolTable = NULL;
 struct treeNode *ast = NULL;
@@ -52,14 +53,22 @@ input:
 block:
     declarations formula SEMICOLON { 
         fprintf(stderr, "PAR: Formula completed with Semicolon.\n");
-        
+
         fprintf(stderr, "\n----- New Block Parsed -----\n"); 
 
         fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
+        fprintf(stderr, "\n");
         printTree($2, 0);
         fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
 
         printSymbolTable(symbolTable);
+
+        fprintf(stderr, "\n----- Declaration ------\n");
+        printDeclaration(symbolTable);
+        fprintf(stderr, "---------------------\n");
+
+        printFormula($2);
+        fprintf(stdout, " ;\n");
 
         deleteTree($2);
         }

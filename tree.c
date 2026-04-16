@@ -88,6 +88,7 @@ void printTree(struct treeNode *root, int level) {
         fprintf(stderr, ".");
     }
 
+
     switch (root->nodeType) {
         case NODE_QUANTOR: 
             if (root->treeTypes.quantorType.quantorType == FORALL) {

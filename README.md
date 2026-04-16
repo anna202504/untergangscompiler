@@ -11,3 +11,7 @@
 
 Wichtig: Bei den ersten beiden Schritten wird auf die flex-Datei zugegriffen. Beim 4. Schritt muss eine input-Datei in PL1
 eingegeben werden. 
+
+Datei von Output erstellen:
+
+pl1c Input_folder/complex_in.pl1 > out.pl1
