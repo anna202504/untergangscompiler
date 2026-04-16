@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "klammer.h"
 #include "symbol_table.h"
 #include "tree.h"
 
@@ -60,6 +61,10 @@ block:
         fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
 
         printSymbolTable(symbolTable);
+        printDeclarationsFromSymbolTable(symbolTable);
+        fprintf(stdout, "\n");
+        printFormulaFromSyntaxTree($2);
+        fprintf(stdout, ";\n");
 
         deleteTree($2);
         }
