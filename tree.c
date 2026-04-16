@@ -1,3 +1,38 @@
+// Neue Knoten für explizite Baumstruktur (wie im Bild)
+struct node* create_arg_node(struct node *left, struct node *right) {
+    struct node *n = malloc(sizeof(struct node));
+    n->nodeType = NODE_ARG;
+    n->types.binaryType.left = left;
+    n->types.binaryType.right = right;
+    fprintf(stderr, "SYT: ARG Node created\n");
+    return n;
+}
+
+struct node* create_var_node(struct tableEntry *entry) {
+    struct node *n = malloc(sizeof(struct node));
+    n->nodeType = NODE_VAR;
+    n->types.variableType.entry = entry;
+    fprintf(stderr, "SYT: VAR Node created\n");
+    return n;
+}
+
+struct node* create_pred_node(struct tableEntry *entry, struct node *args) {
+    struct node *n = malloc(sizeof(struct node));
+    n->nodeType = NODE_PRED;
+    n->types.predicateType.entry = entry;
+    n->types.predicateType.arguments = args;
+    fprintf(stderr, "SYT: PRED Node created\n");
+    return n;
+}
+
+struct node* create_func_node(struct tableEntry *entry, struct node *args) {
+    struct node *n = malloc(sizeof(struct node));
+    n->nodeType = NODE_FUNC;
+    n->types.functionType.entry = entry;
+    n->types.functionType.arguments = args;
+    fprintf(stderr, "SYT: FUNC Node created\n");
+    return n;
+}
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -137,7 +172,7 @@ void print_tree(FILE *out, struct node *tree, int depth) {
                 case OP_OR: op_name = "OR"; break;
                 case OP_IMPLIES: op_name = "IMPLICATION"; break;
                 case OP_EQUIV: op_name = "EQUIVALENT"; break;
-                case OP_ARGLIST: op_name = NULL; break; 
+                case OP_ARGLIST: op_name = NULL; break;
                 default: op_name = "UNKNOWN"; break;
             }
             if (op_name) {
@@ -157,6 +192,28 @@ void print_tree(FILE *out, struct node *tree, int depth) {
             print_tree(out, tree->types.quantorType.formula, depth + 1);
             break;
         }
+        // Neue explizite Knoten für Bildstruktur
+        case NODE_ARG:
+            fprintf(out, "%s", indent); // keine STP: Zeile für arg, nur Einrückung
+            if (tree->types.binaryType.left)
+                print_tree(out, tree->types.binaryType.left, depth + 1);
+            if (tree->types.binaryType.right)
+                print_tree(out, tree->types.binaryType.right, depth + 1);
+            break;
+        case NODE_VAR:
+            fprintf(out, "STP: %sVariable: %s\n", indent, tree->types.variableType.entry->identifier);
+            break;
+        case NODE_PRED:
+            fprintf(out, "STP: %sPredicate: %s\n", indent, tree->types.predicateType.entry->identifier);
+            if (tree->types.predicateType.arguments)
+                print_tree(out, tree->types.predicateType.arguments, depth + 1);
+            break;
+        case NODE_FUNC:
+            fprintf(out, "STP: %sFunction: %s\n", indent, tree->types.functionType.entry->identifier);
+            if (tree->types.functionType.arguments)
+                print_tree(out, tree->types.functionType.arguments, depth + 1);
+            break;
+    }
     }
 }
 
