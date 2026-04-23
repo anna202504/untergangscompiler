@@ -5,6 +5,7 @@
 #include "klammer.h"
 #include "symbol_table.h"
 #include "tree.h"
+#include "optimierung/optimierung.h"
 
 struct tableEntry *symbolTable = NULL;
 struct treeNode *ast = NULL;
@@ -60,13 +61,21 @@ block:
         printTree($2, 0);
         fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
 
+        struct treeNode *opt = eliminate_double_negation($2);
+        opt = eliminate_implications_and_equivalences(opt);
+        opt = push_negations_to_predicates(opt);
+
+        fprintf(stderr, "\n----- Optimized Syntax Tree -----\n");
+        printTree(opt, 0);
+        fprintf(stderr, "----- End of Optimized Syntax Tree -----\n");
+
         printSymbolTable(symbolTable);
         printDeclarationsFromSymbolTable(symbolTable);
         fprintf(stdout, "\n");
-        printFormulaFromSyntaxTree($2);
+        printFormulaFromSyntaxTree(opt);
         fprintf(stdout, ";\n");
 
-        deleteTree($2);
+        deleteTree(opt);
         }
     ;
 

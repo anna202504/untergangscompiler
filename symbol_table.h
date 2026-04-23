@@ -7,7 +7,7 @@ struct tableEntry {
     char *type;
     int arity;
     struct tableEntry *next;
-} tableEntry;
+};
 
 // Funktionsprototypen
 void addSymbolEntry(struct tableEntry **head, char *identifier, char *type, int arity);

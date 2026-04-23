@@ -7,7 +7,7 @@
 #*                                            *
 #**********************************************
 
-objects = parser.o scanner.o symbol_table.o tree.o klammer.o #error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
+objects = parser.o scanner.o symbol_table.o tree.o klammer.o optimierung/optimierung1.o #error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
 CC	= gcc
 LEX	= flex
 YACC	= bison
@@ -38,6 +38,9 @@ parser.o:	parser.h symbol_table.h
 #main.o:		debug.h error.h parser.h generate.h process.h syntaxtree.h symboltable.h
 #parser.h:	parser.y
 
+
+optimierung/optimierung1.o: optimierung/optimierung1.c optimierung/optimierung.h
+	$(CC) -c -o $@ $<
 
 clean:
 	rm pl1c parser.c scanner.c parser.h $(objects)

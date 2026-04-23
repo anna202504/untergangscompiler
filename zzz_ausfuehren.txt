@@ -1,6 +1,52 @@
-
 im richtigen Ordner 
 
 make clean 
 make 
 ./pl1c Input_folder/complex_in.pl1
+
+
+# Optimierung 1 ------------------------------------------------------------------
+# Nur die OPT-Zeilen anzeigen
+./pl1c Input_folder/simple-doubleneg_in.pl1 2>&1 | grep "OPT:"
+
+# Baum vorher/nachher + OPT-Zeilen
+./pl1c Input_folder/simple-doubleneg_in.pl1 2>&1 | grep -E "OPT:|STP:|---"
+
+# Nur die finale Formel (stdout)
+./pl1c Input_folder/simple-doubleneg_in.pl1 2>/dev/null
+
+
+# Optimierung 2 ------------------------------------------------------------------
+Nur die Optimierungsaktionen sehen:
+./pl1c Input_folder/simple-negand_in.pl1 2>&1 | grep "OPT:"
+
+Bäume vorher/nachher + Aktionen:
+./pl1c Input_folder/simple-negand_in.pl1 2>&1 | grep -E "OPT:|STP:|-----"
+
+Nur die finale Formel (kein Debug-Output):
+./pl1c Input_folder/simple-negand_in.pl1 2>/dev/null
+
+Alle 14 Testfälle auf einmal:
+for f in Input_folder/*_in.pl1; do echo "=== $f ==="; ./pl1c "$f" 2>/dev/null; echo; done
+
+
+# Optimierung 3 ------------------------------------------------------------------
+# Implikation: A -> B  =>  ~A | B
+./pl1c Input_folder/simple-imply_in.pl1 2>&1 | grep -E "OPT:|STP:"
+
+# Äquivalenz: A <-> B  =>  (~A | B) & (~B | A)
+./pl1c Input_folder/simple-equiv_in.pl1 2>&1 | grep -E "OPT:|STP:"
+
+# Kombination: AND mit Äquivalenz
+./pl1c Input_folder/simple-andequiv_in.pl1 2>&1 | grep -E "OPT:|STP:"
+
+# Komplexes Beispiel mit allem
+./pl1c Input_folder/complex_in.pl1 2>&1 | grep "OPT:"
+
+Nur die finale transformierte Formel sehen:
+./pl1c Input_folder/simple-imply_in.pl1 2>/dev/null
+./pl1c Input_folder/simple-equiv_in.pl1 2>/dev/null
+./pl1c Input_folder/formel_in.pl1 2>/dev/null
+
+Baum vorher vs. nachher (übersichtlich):
+./pl1c Input_folder/simple-equiv_in.pl1 2>&1 | grep -E "STP:|-----"
