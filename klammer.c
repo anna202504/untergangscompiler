@@ -69,13 +69,13 @@ void printFormulaRec(struct treeNode *root, int parentPrecedence) {
             }
 
             if (f != NULL) {
-                if (f->nodeType == NODE_BINARY_OPERATOR ||
-                    f->nodeType == NODE_PREDICATE) {
+                if (f->nodeType == NODE_BINARY_OPERATOR) {
                     fprintf(stdout, "(");
                     printFormulaRec(f, 0);
                     fprintf(stdout, ")");
                 } else if (f->nodeType == NODE_QUANTOR ||
-                        f->nodeType == NODE_UNARY_OPERATOR) {
+                        f->nodeType == NODE_UNARY_OPERATOR ||
+                        f->nodeType == NODE_PREDICATE) {
                     printFormulaRec(f, 0);
                 } else {
                     fprintf(stdout, " ");
@@ -176,7 +176,6 @@ void printFormulaRec(struct treeNode *root, int parentPrecedence) {
 
 void printFormula(struct treeNode *root) {
     printFormulaRec(root, 0);
-    fprintf(stdout, "\n");
 }
 
 

@@ -5,6 +5,7 @@
 #include "symbol_table.h"
 #include "tree.h"
 #include "klammer.h"
+#include "optimierung1.h"
 
 struct tableEntry *symbolTable = NULL;
 struct treeNode *ast = NULL;
@@ -52,13 +53,19 @@ input:
 
 block:
     declarations formula SEMICOLON { 
+        struct treeNode *opt = replaceImplicationsAndEquivalences($2);
+        opt = eliminateDoubleNegations(opt);
+        opt = moveNegations(opt);
+        opt = evaluateBooleanOperations(opt);
+        opt = eliminateDoubleNegations(opt);       
+
         fprintf(stderr, "PAR: Formula completed with Semicolon.\n");
 
         fprintf(stderr, "\n----- New Block Parsed -----\n"); 
 
         fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
         fprintf(stderr, "\n");
-        printTree($2, 0);
+        printTree(opt, 0);
         fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
 
         printSymbolTable(symbolTable);
@@ -66,10 +73,12 @@ block:
         fprintf(stderr, "\n----- Declaration & Formula ------\n");
         printDeclaration(symbolTable);
         fprintf(stdout, "\n");
-        printFormula($2);
+        printFormula(opt);
         fprintf(stdout, " ;\n");
+        fflush(stdout);
+        fprintf(stderr, "\n----- END ------\n");
 
-        deleteTree($2);
+        deleteTree(opt);
         }
     ;
 
