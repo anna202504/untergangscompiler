@@ -14,4 +14,8 @@ void addSymbolEntry(struct tableEntry **head, char *identifier, char *type, int 
 
 struct tableEntry *getSymbolEntry(struct tableEntry *head, char *identifier);
 
+void printSymbolTable(struct tableEntry *head);
+
+void clearSymbolTable(struct tableEntry **head);
+
 #endif // SYMBOL_TABLE_H
