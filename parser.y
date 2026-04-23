@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "klammer.h"
+#include "optimierung.h"
 #include "symbol_table.h"
 #include "tree.h"
 
@@ -52,21 +53,23 @@ input:
 
 block:
     declarations formula SEMICOLON { 
+        struct treeNode *optimizedTree = pushNegationsToPredicates(eliminateBooleanConstants(eliminateEquivalences(eliminateImplications(eliminateDoubleNegations($2)))));
+
         fprintf(stderr, "PAR: Formula completed with Semicolon.\n");
         
         fprintf(stderr, "\n----- New Block Parsed -----\n"); 
 
         fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
-        printTree($2, 0);
+        printTree(optimizedTree, 0);
         fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
 
         printSymbolTable(symbolTable);
         printDeclarationsFromSymbolTable(symbolTable);
         fprintf(stdout, "\n");
-        printFormulaFromSyntaxTree($2);
+        printFormulaFromSyntaxTree(optimizedTree);
         fprintf(stdout, ";\n");
 
-        deleteTree($2);
+        deleteTree(optimizedTree);
         }
     ;
 

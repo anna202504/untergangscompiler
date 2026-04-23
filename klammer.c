@@ -125,7 +125,7 @@ static void printFormulaNode(const struct treeNode *node, int parentPrecedence, 
 			printFormulaNode(node->treeTypes.binaryType.right, nodePrecedence, 1);
 			break;
 		case NODE_UNARY_OPERATOR:
-			fprintf(stdout, " ~ ");
+			fprintf(stdout, "~");
 			printFormulaNode(node->treeTypes.unaryType.child, PREC_NOT, 1);
 			break;
 		case NODE_PREDICATE:
