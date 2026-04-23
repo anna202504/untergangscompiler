@@ -63,10 +63,9 @@ block:
 
         printSymbolTable(symbolTable);
 
-        fprintf(stderr, "\n----- Declaration ------\n");
+        fprintf(stderr, "\n----- Declaration & Formula ------\n");
         printDeclaration(symbolTable);
-        fprintf(stderr, "---------------------\n");
-
+        fprintf(stdout, "\n");
         printFormula($2);
         fprintf(stdout, " ;\n");
 
