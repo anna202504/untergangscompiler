@@ -1,8 +1,131 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "tree.h"
 #include "symboltable.h"
+
+// Hilfsfunktion: String anhängen (mit Realloc)
+static void strappend(char **dest, const char *src) {
+    if (!src) return;
+    size_t oldlen = *dest ? strlen(*dest) : 0;
+    size_t addlen = strlen(src);
+    *dest = realloc(*dest, oldlen + addlen + 1);
+    strcpy(*dest + oldlen, src);
+}
+
+// Hilfsfunktion: Argumentliste als String
+static void args_to_string(struct node *args, char **out) {
+    if (!args) return;
+    if (args->nodeType == NODE_BINARY && args->types.binaryType.op == OP_ARGLIST) {
+        args_to_string(args->types.binaryType.left, out);
+        strappend(out, ", ");
+        args_to_string(args->types.binaryType.right, out);
+    } else if (args->nodeType == NODE_ARG) {
+        args_to_string(args->types.binaryType.left, out);
+        if (args->types.binaryType.right) {
+            strappend(out, ", ");
+            args_to_string(args->types.binaryType.right, out);
+        }
+    } else {
+        char *tmp = tree_to_pl1_formula(args);
+        strappend(out, tmp);
+        free(tmp);
+    }
+}
+
+// Hauptfunktion: Baum zu PL1-Formel
+char *tree_to_pl1_formula(struct node *tree) {
+    if (!tree) return NULL;
+    char *out = calloc(1, 1);
+    char buf[64];
+    switch (tree->nodeType) {
+        case NODE_BOOL:
+            strappend(&out, tree->types.boolType.value ? "TRUE" : "FALSE");
+            break;
+        case NODE_NUMBER:
+            snprintf(buf, sizeof(buf), "%d", tree->types.numberType.value);
+            strappend(&out, buf);
+            break;
+        case NODE_VARIABLE:
+        case NODE_VAR:
+            strappend(&out, tree->types.variableType.entry->identifier);
+            break;
+        case NODE_PREDICATE:
+        case NODE_PRED:
+            strappend(&out, tree->types.predicateType.entry->identifier);
+            if (tree->types.predicateType.arguments) {
+                strappend(&out, "(");
+                args_to_string(tree->types.predicateType.arguments, &out);
+                strappend(&out, ")");
+            }
+            break;
+        case NODE_FUNCTION:
+        case NODE_FUNC:
+            strappend(&out, tree->types.functionType.entry->identifier);
+            if (tree->types.functionType.arguments) {
+                strappend(&out, "(");
+                args_to_string(tree->types.functionType.arguments, &out);
+                strappend(&out, ")");
+            }
+            break;
+        case NODE_UNARY:
+            switch (tree->types.unaryType.op) {
+                case OP_NOT:
+                    strappend(&out, "~");
+                    break;
+            }
+            {
+                char *sub = tree_to_pl1_formula(tree->types.unaryType.formula);
+                strappend(&out, "(");
+                strappend(&out, sub);
+                strappend(&out, ")");
+                free(sub);
+            }
+            break;
+        case NODE_BINARY: {
+            const char *op = NULL;
+            switch (tree->types.binaryType.op) {
+                case OP_AND: op = "&"; break;
+                case OP_OR: op = "|"; break;
+                case OP_IMPLIES: op = "=>"; break;
+                case OP_EQUIV: op = "<=>"; break;
+                case OP_ARGLIST: // sollte nicht als Formel erscheinen
+                    return tree_to_pl1_formula(tree->types.binaryType.left);
+            }
+            char *l = tree_to_pl1_formula(tree->types.binaryType.left);
+            char *r = tree_to_pl1_formula(tree->types.binaryType.right);
+            strappend(&out, "(");
+            strappend(&out, l);
+            strappend(&out, " ");
+            strappend(&out, op);
+            strappend(&out, " ");
+            strappend(&out, r);
+            strappend(&out, ")");
+            free(l); free(r);
+            break;
+        }
+        case NODE_QUANTOR: {
+            const char *q = (tree->types.quantorType.op == OP_FORALL) ? "ALL" : "EX";
+            strappend(&out, q);
+            strappend(&out, " ");
+            char *v = tree_to_pl1_formula(tree->types.quantorType.variable);
+            strappend(&out, v);
+            free(v);
+            strappend(&out, ": ");
+            char *f = tree_to_pl1_formula(tree->types.quantorType.formula);
+            strappend(&out, f);
+            free(f);
+            break;
+        }
+        case NODE_ARG:
+            // Argumentkette: nur Argumente ausgeben, ohne Klammern
+            args_to_string(tree, &out);
+            break;
+    }
+    return out;
+}
+
 
 // ...existing code...
 // Neue Knoten für explizite Baumstruktur (wie im Bild)

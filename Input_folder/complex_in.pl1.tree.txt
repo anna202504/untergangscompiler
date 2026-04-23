@@ -1,24 +1,15 @@
-STP: ----- Start Syntax Tree Printout. -----
-STP: EQUIVALENT
-STP: .IMPLICATION
-STP: ..AND
-STP: ...AND
-STP: ....Variable: x
-STP: ....NOT
-STP: .....OR
-STP: ......Predicate: P1
-STP: ......NOT
-STP: .......Predicate: P2
-STP: ........Variable: x
-STP: ...Predicate: P2
-STP: ....Number: 1
-STP: ..NOT
-STP: ...AND
-STP: ....AND
-STP: .....Variable: z
-STP: .....AND
-STP: ......Variable: y
-STP: ......NOT
+Symbol Table:
+Identifier: z, Type: int, Arity: 0
+Identifier: y, Type: int, Arity: 0
+Identifier: x, Type: int, Arity: 0
+Identifier: g, Type: function, Arity: 2
+Identifier: f, Type: function, Arity: 1
+Identifier: c, Type: function, Arity: 0
+Identifier: P3, Type: predicate, Arity: 3
+Identifier: P2, Type: predicate, Arity: 1
+Identifier: P1, Type: predicate, Arity: 0
+------------------
+...NOT
 STP: .......Predicate: P3
 .................STP: ..........Function: c
 STP: ..........Function: f

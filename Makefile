@@ -49,5 +49,5 @@ parser.o:	parser.h symboltable.h
 clean:
 	rm pl1c parser.c scanner.c parser.h $(objects) $(TREE_FILES)
 
-klammer: klammer.o symboltable.o
-	$(CC) -o $@ klammer.o symboltable.o
+klammer: klammer.o symboltable.o tree.o
+	$(CC) -o $@ klammer.o symboltable.o tree.o

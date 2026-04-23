@@ -102,4 +102,7 @@ void print_tree(FILE *out, struct node *tree, int depth);
 void free_tree(struct node *tree);
 int count_arguments(struct node *args);
 
+// Wandelt einen Syntaxbaum in eine PL1-V-Formel um (liefert neuen String, muss mit free() freigegeben werden)
+char *tree_to_pl1_formula(struct node *tree);
+
 #endif
