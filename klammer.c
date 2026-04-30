@@ -86,8 +86,6 @@ static void printFormulaNode(const struct treeNode *node, int parentPrecedence, 
 	if (parentPrecedence > 0) {
 		if (nodePrecedence < parentPrecedence) {
 			needsParentheses = 1;
-		} else if (nodePrecedence == parentPrecedence && isRightChild && node->nodeType == NODE_BINARY_OPERATOR) {
-			needsParentheses = 1;
 		}
 	}
 
