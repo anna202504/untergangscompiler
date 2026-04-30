@@ -4,3 +4,11 @@ im richtigen Ordner
 make clean 
 make 
 ./pl1c Input_folder/complex_in.pl1
+
+
+
+	if (parentPrecedence > 0) {
+		if (nodePrecedence < parentPrecedence) {
+			needsParentheses = 1;
+		}
+	}

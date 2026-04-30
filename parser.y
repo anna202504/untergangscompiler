@@ -6,9 +6,12 @@
 #include "optimierung.h"
 #include "symbol_table.h"
 #include "tree.h"
+#include "multiple.h"
 
 struct tableEntry *symbolTable = NULL;
 struct treeNode *ast = NULL;
+struct formulaList *formulaListHead = NULL;
+struct formulaList *formulaListTail = NULL;
 
 int yylex(void);
 void yyerror(const char *s);
@@ -62,14 +65,8 @@ block:
         fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
         printTree(optimizedTree, 0);
         fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
-
-        printSymbolTable(symbolTable);
-        printDeclarationsFromSymbolTable(symbolTable);
-        fprintf(stdout, "\n");
-        printFormulaFromSyntaxTree(optimizedTree);
-        fprintf(stdout, ";\n");
-
-        deleteTree(optimizedTree);
+        
+        addFormula(&formulaListHead, &formulaListTail, optimizedTree);
         }
     ;
 
@@ -370,6 +367,13 @@ int main(int argc, char *argv[]){
     int result = yyparse();
     fclose(fp);
 
+    fprintf(stdout, "\n");
+    printDeclarationsFromSymbolTable(symbolTable);
+
+    fprintf(stdout, "\n");
+    printAllFormulas(formulaListHead);
+
+    deleteAllFormulas(&formulaListHead, &formulaListTail);
     clearSymbolTable(&symbolTable);
 
     return result;

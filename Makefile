@@ -7,7 +7,7 @@
 #*                                            *
 #**********************************************
 
-objects = parser.o scanner.o symbol_table.o tree.o klammer.o optimierung.o #error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
+objects = parser.o scanner.o symbol_table.o tree.o klammer.o optimierung.o multiple.o #error.o debug.o symboltable.o syntaxtree.o optimize.o generate.o process.o main.o
 CC	= gcc
 LEX	= flex
 YACC	= bison
@@ -28,6 +28,7 @@ scanner.c:	scanner.l
 #debug.o:	debug.h error.h
 #scanner.o:	debug.h error.h parser.h
 scanner.o: parser.h
+multiple.o: multiple.h tree.h klammer.h
 #symboltable.o:	debug.h error.h symboltable.h
 #syntaxtree.o:	debug.h error.h syntaxtree.h symboltable.h
 #optimize.o:	debug.h error.h optimize.h syntaxtree.h symboltable.h

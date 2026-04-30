@@ -127,9 +127,12 @@
 #include "optimierung.h"
 #include "symbol_table.h"
 #include "tree.h"
+#include "multiple.h"
 
 struct tableEntry *symbolTable = NULL;
 struct treeNode *ast = NULL;
+struct formulaList *formulaListHead = NULL;
+struct formulaList *formulaListTail = NULL;
 
 int yylex(void);
 void yyerror(const char *s);
@@ -156,7 +159,7 @@ extern FILE *yyin;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 18 "parser.y"
+#line 21 "parser.y"
 {
     char* str;
     int val;
@@ -164,7 +167,7 @@ typedef union YYSTYPE
     char id[101];
 }
 /* Line 193 of yacc.c.  */
-#line 168 "parser.c"
+#line 171 "parser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -177,7 +180,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 181 "parser.c"
+#line 184 "parser.c"
 
 #ifdef short
 # undef short
@@ -473,10 +476,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    49,    49,    51,    55,    77,    78,    82,    95,   108,
-     128,   132,   133,   144,   145,   156,   157,   168,   169,   180,
-     181,   191,   197,   203,   204,   224,   244,   248,   275,   276,
-     280,   283,   293,   321,   327
+       0,    52,    52,    54,    58,    74,    75,    79,    92,   105,
+     125,   129,   130,   141,   142,   153,   154,   165,   166,   177,
+     178,   188,   194,   200,   201,   221,   241,   245,   272,   273,
+     277,   280,   290,   318,   324
 };
 #endif
 
@@ -1419,7 +1422,7 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 55 "parser.y"
+#line 58 "parser.y"
     { 
         struct treeNode *optimizedTree = pushNegationsToPredicates(eliminateBooleanConstants(eliminateEquivalences(eliminateImplications(eliminateDoubleNegations((yyvsp[(2) - (3)].p))))));
 
@@ -1430,19 +1433,13 @@ yyreduce:
         fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
         printTree(optimizedTree, 0);
         fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
-
-        printSymbolTable(symbolTable);
-        printDeclarationsFromSymbolTable(symbolTable);
-        fprintf(stdout, "\n");
-        printFormulaFromSyntaxTree(optimizedTree);
-        fprintf(stdout, ";\n");
-
-        deleteTree(optimizedTree);
+        
+        addFormula(&formulaListHead, &formulaListTail, optimizedTree);
         ;}
     break;
 
   case 7:
-#line 82 "parser.y"
+#line 79 "parser.y"
     {
         fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].val));
 
@@ -1459,7 +1456,7 @@ yyreduce:
     break;
 
   case 8:
-#line 95 "parser.y"
+#line 92 "parser.y"
     {
         fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].val));
 
@@ -1476,7 +1473,7 @@ yyreduce:
     break;
 
   case 9:
-#line 108 "parser.y"
+#line 105 "parser.y"
     {
         fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", (yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].str));
 
@@ -1497,12 +1494,12 @@ yyreduce:
     break;
 
   case 11:
-#line 132 "parser.y"
+#line 129 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 12:
-#line 133 "parser.y"
+#line 130 "parser.y"
     { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: EQUIVALENT\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1514,12 +1511,12 @@ yyreduce:
     break;
 
   case 13:
-#line 144 "parser.y"
+#line 141 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 14:
-#line 145 "parser.y"
+#line 142 "parser.y"
     { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: IMPLICATION\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1531,12 +1528,12 @@ yyreduce:
     break;
 
   case 15:
-#line 156 "parser.y"
+#line 153 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 16:
-#line 157 "parser.y"
+#line 154 "parser.y"
     { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: OR\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1548,12 +1545,12 @@ yyreduce:
     break;
 
   case 17:
-#line 168 "parser.y"
+#line 165 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 18:
-#line 169 "parser.y"
+#line 166 "parser.y"
     { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: AND\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1565,12 +1562,12 @@ yyreduce:
     break;
 
   case 19:
-#line 180 "parser.y"
+#line 177 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 20:
-#line 181 "parser.y"
+#line 178 "parser.y"
     { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: NEGATION\n"); 
         (yyval.p) = makeNode(NODE_UNARY_OPERATOR);
@@ -1581,7 +1578,7 @@ yyreduce:
     break;
 
   case 21:
-#line 191 "parser.y"
+#line 188 "parser.y"
     { 
         (yyval.p) = makeNode(NODE_BOOL);
         (yyval.p)->treeTypes.boolType.value = 1;
@@ -1591,7 +1588,7 @@ yyreduce:
     break;
 
   case 22:
-#line 197 "parser.y"
+#line 194 "parser.y"
     { 
         (yyval.p) = makeNode(NODE_BOOL);
         (yyval.p)->treeTypes.boolType.value = 0;
@@ -1601,12 +1598,12 @@ yyreduce:
     break;
 
   case 23:
-#line 203 "parser.y"
+#line 200 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 24:
-#line 204 "parser.y"
+#line 201 "parser.y"
     {
             struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(3) - (5)].str));
             if(entry == NULL) {
@@ -1630,7 +1627,7 @@ yyreduce:
     break;
 
   case 25:
-#line 224 "parser.y"
+#line 221 "parser.y"
     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(3) - (5)].str));
         if(entry == NULL) {
@@ -1654,12 +1651,12 @@ yyreduce:
     break;
 
   case 26:
-#line 244 "parser.y"
+#line 241 "parser.y"
     { (yyval.p) = (yyvsp[(2) - (3)].p); ;}
     break;
 
   case 27:
-#line 248 "parser.y"
+#line 245 "parser.y"
     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(1) - (4)].str));
         if(entry == NULL) { 
@@ -1687,24 +1684,24 @@ yyreduce:
     break;
 
   case 28:
-#line 275 "parser.y"
+#line 272 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); ;}
     break;
 
   case 29:
-#line 276 "parser.y"
+#line 273 "parser.y"
     { (yyval.p) = NULL; ;}
     break;
 
   case 30:
-#line 280 "parser.y"
+#line 277 "parser.y"
     { (yyval.p) = (yyvsp[(1) - (1)].p); 
     fprintf(stderr, "SYT: Argument Node created\n"); 
     ;}
     break;
 
   case 31:
-#line 283 "parser.y"
+#line 280 "parser.y"
     {
         struct treeNode *last = (yyvsp[(1) - (3)].p);
         while(last->next) last = last->next;
@@ -1715,7 +1712,7 @@ yyreduce:
     break;
 
   case 32:
-#line 293 "parser.y"
+#line 290 "parser.y"
     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(1) - (1)].str));
         if(entry == NULL) {
@@ -1747,7 +1744,7 @@ yyreduce:
     break;
 
   case 33:
-#line 321 "parser.y"
+#line 318 "parser.y"
     {
         fprintf(stderr, "PAR: TERM: Number: %d\n", (yyvsp[(1) - (1)].val));
         (yyval.p) = makeNode(NODE_NUMBER);
@@ -1757,7 +1754,7 @@ yyreduce:
     break;
 
   case 34:
-#line 327 "parser.y"
+#line 324 "parser.y"
     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[(1) - (4)].str));
         if(entry == NULL) { 
@@ -1785,7 +1782,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1789 "parser.c"
+#line 1786 "parser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1999,7 +1996,7 @@ yyreturn:
 }
 
 
-#line 352 "parser.y"
+#line 349 "parser.y"
 
 
 void yyerror(const char *s) {
@@ -2021,6 +2018,13 @@ int main(int argc, char *argv[]){
     int result = yyparse();
     fclose(fp);
 
+    fprintf(stdout, "\n");
+    printDeclarationsFromSymbolTable(symbolTable);
+
+    fprintf(stdout, "\n");
+    printAllFormulas(formulaListHead);
+
+    deleteAllFormulas(&formulaListHead, &formulaListTail);
     clearSymbolTable(&symbolTable);
 
     return result;
