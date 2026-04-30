@@ -74,10 +74,6 @@ block:
         
         fprintf(stderr, "\n----- New Block Parsed -----\n");
 
-        fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
-        printTree($2, 0);
-        fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
-
         struct treeNode *opt = eliminate_double_negation($2);
         opt = eliminate_implications_and_equivalences(opt);
         opt = push_negations_to_predicates(opt);

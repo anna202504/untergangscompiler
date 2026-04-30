@@ -557,10 +557,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    66,    66,    68,    72,    97,    98,   102,   115,   128,
-     148,   152,   153,   164,   165,   176,   177,   188,   189,   200,
-     201,   211,   217,   223,   224,   244,   264,   268,   295,   296,
-     300,   303,   313,   341,   347
+       0,    66,    66,    68,    72,    93,    94,    98,   111,   124,
+     144,   148,   149,   160,   161,   172,   173,   184,   185,   196,
+     197,   207,   213,   219,   220,   240,   260,   264,   291,   292,
+     296,   299,   309,   337,   343
 };
 #endif
 
@@ -1167,10 +1167,6 @@ yyreduce:
         
         fprintf(stderr, "\n----- New Block Parsed -----\n");
 
-        fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
-        printTree((yyvsp[-1].p), 0);
-        fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
-
         struct treeNode *opt = eliminate_double_negation((yyvsp[-1].p));
         opt = eliminate_implications_and_equivalences(opt);
         opt = push_negations_to_predicates(opt);
@@ -1184,11 +1180,11 @@ yyreduce:
 
         add_formula(opt);
         }
-#line 1188 "parser.c"
+#line 1184 "parser.c"
     break;
 
   case 7: /* declaration: DECLARE PREDICATE STRING COLON INT  */
-#line 102 "parser.y"
+#line 98 "parser.y"
                                        {
         fprintf(stderr, "PAR: Declaration: Predicate -%s- Arity: %d\n", (yyvsp[-2].str), (yyvsp[0].val));
 
@@ -1202,11 +1198,11 @@ yyreduce:
             addSymbolEntry(&symbolTable, (yyvsp[-2].str), "predicate", (yyvsp[0].val));  
         }
     }
-#line 1206 "parser.c"
+#line 1202 "parser.c"
     break;
 
   case 8: /* declaration: DECLARE FUNCTION STRING COLON INT  */
-#line 115 "parser.y"
+#line 111 "parser.y"
                                         {
         fprintf(stderr, "PAR: Declaration: Function -%s- Arity: %d\n", (yyvsp[-2].str), (yyvsp[0].val));
 
@@ -1220,11 +1216,11 @@ yyreduce:
             addSymbolEntry(&symbolTable, (yyvsp[-2].str), "function", (yyvsp[0].val));
         }
     }
-#line 1224 "parser.c"
+#line 1220 "parser.c"
     break;
 
   case 9: /* declaration: DECLARE VARIABLE STRING COLON STRING  */
-#line 128 "parser.y"
+#line 124 "parser.y"
                                            {
         fprintf(stderr, "PAR: Declaration: Variable -%s- Type: %s\n", (yyvsp[-2].str), (yyvsp[0].str));
 
@@ -1242,17 +1238,17 @@ yyreduce:
             addSymbolEntry(&symbolTable, (yyvsp[-2].str), "variable", 0);
         }
     }
-#line 1246 "parser.c"
+#line 1242 "parser.c"
     break;
 
   case 11: /* equiv_formula: implies_formula  */
-#line 152 "parser.y"
+#line 148 "parser.y"
                       { (yyval.p) = (yyvsp[0].p); }
-#line 1252 "parser.c"
+#line 1248 "parser.c"
     break;
 
   case 12: /* equiv_formula: equiv_formula EQUIV implies_formula  */
-#line 153 "parser.y"
+#line 149 "parser.y"
                                           { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: EQUIVALENT\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1261,17 +1257,17 @@ yyreduce:
         (yyval.p)->treeTypes.binaryType.operatorType = BINOP_IFF;
         fprintf(stderr, "SYT: Binary Node created - Type <->\n");
     }
-#line 1265 "parser.c"
+#line 1261 "parser.c"
     break;
 
   case 13: /* implies_formula: or_formula  */
-#line 164 "parser.y"
+#line 160 "parser.y"
                  { (yyval.p) = (yyvsp[0].p); }
-#line 1271 "parser.c"
+#line 1267 "parser.c"
     break;
 
   case 14: /* implies_formula: implies_formula IMPLIES or_formula  */
-#line 165 "parser.y"
+#line 161 "parser.y"
                                          { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: IMPLICATION\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1280,17 +1276,17 @@ yyreduce:
         (yyval.p)->treeTypes.binaryType.operatorType = BINOP_IMPLIES;
         fprintf(stderr, "SYT: Binary Node created - Type ->\n");
     }
-#line 1284 "parser.c"
+#line 1280 "parser.c"
     break;
 
   case 15: /* or_formula: and_formula  */
-#line 176 "parser.y"
+#line 172 "parser.y"
                   { (yyval.p) = (yyvsp[0].p); }
-#line 1290 "parser.c"
+#line 1286 "parser.c"
     break;
 
   case 16: /* or_formula: or_formula OR and_formula  */
-#line 177 "parser.y"
+#line 173 "parser.y"
                                 { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: OR\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1299,17 +1295,17 @@ yyreduce:
         (yyval.p)->treeTypes.binaryType.operatorType = BINOP_OR;
         fprintf(stderr, "SYT: Binary Node created - Type |\n");
     }
-#line 1303 "parser.c"
+#line 1299 "parser.c"
     break;
 
   case 17: /* and_formula: not_formula  */
-#line 188 "parser.y"
+#line 184 "parser.y"
                   { (yyval.p) = (yyvsp[0].p); }
-#line 1309 "parser.c"
+#line 1305 "parser.c"
     break;
 
   case 18: /* and_formula: and_formula AND not_formula  */
-#line 189 "parser.y"
+#line 185 "parser.y"
                                   { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: AND\n"); 
         (yyval.p) = makeNode(NODE_BINARY_OPERATOR);
@@ -1318,17 +1314,17 @@ yyreduce:
         (yyval.p)->treeTypes.binaryType.operatorType = BINOP_AND;
         fprintf(stderr, "SYT: Binary Node created - Type &\n");
     }
-#line 1322 "parser.c"
+#line 1318 "parser.c"
     break;
 
   case 19: /* not_formula: quant_or_atom  */
-#line 200 "parser.y"
+#line 196 "parser.y"
                     { (yyval.p) = (yyvsp[0].p); }
-#line 1328 "parser.c"
+#line 1324 "parser.c"
     break;
 
   case 20: /* not_formula: NOT not_formula  */
-#line 201 "parser.y"
+#line 197 "parser.y"
                       { 
         fprintf(stderr,"PAR: Formula reduced - JUNCTOR: NEGATION\n"); 
         (yyval.p) = makeNode(NODE_UNARY_OPERATOR);
@@ -1336,39 +1332,39 @@ yyreduce:
         (yyval.p)->treeTypes.unaryType.operatorType = UOP_NOT;
         fprintf(stderr, "SYT: Unary Node created - Type ~\n");
     }
-#line 1340 "parser.c"
+#line 1336 "parser.c"
     break;
 
   case 21: /* quant_or_atom: TRUE  */
-#line 211 "parser.y"
+#line 207 "parser.y"
            { 
         (yyval.p) = makeNode(NODE_BOOL);
         (yyval.p)->treeTypes.boolType.value = 1;
         fprintf(stderr, "PAR: Formula reduced - ATOM: TRUE\n");
         fprintf(stderr,"SYT: TRUE Node created\n"); 
       }
-#line 1351 "parser.c"
+#line 1347 "parser.c"
     break;
 
   case 22: /* quant_or_atom: FALSE  */
-#line 217 "parser.y"
+#line 213 "parser.y"
             { 
         (yyval.p) = makeNode(NODE_BOOL);
         (yyval.p)->treeTypes.boolType.value = 0;
         fprintf(stderr, "PAR: Formula reduced - ATOM: FALSE\n");
         fprintf(stderr,"SYT: FALSE Node created\n"); 
       }
-#line 1362 "parser.c"
+#line 1358 "parser.c"
     break;
 
   case 23: /* quant_or_atom: atom  */
-#line 223 "parser.y"
+#line 219 "parser.y"
            { (yyval.p) = (yyvsp[0].p); }
-#line 1368 "parser.c"
+#line 1364 "parser.c"
     break;
 
   case 24: /* quant_or_atom: ALL SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula  */
-#line 224 "parser.y"
+#line 220 "parser.y"
                                                                       {
             struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[-2].str));
             if(entry == NULL) {
@@ -1389,11 +1385,11 @@ yyreduce:
             fprintf(stderr, "SYT: Variable Node created\n");
             fprintf(stderr, "SYT: Quantor Node created - Type ALL\n");
         }
-#line 1393 "parser.c"
+#line 1389 "parser.c"
     break;
 
   case 25: /* quant_or_atom: EXIST SQUARE_BRACKET_OPEN STRING SQUARE_BRACKET_CLOSE not_formula  */
-#line 244 "parser.y"
+#line 240 "parser.y"
                                                                         {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[-2].str));
         if(entry == NULL) {
@@ -1414,17 +1410,17 @@ yyreduce:
         fprintf(stderr, "SYT: Variable Node created\n");
         fprintf(stderr,"SYT: Quantor Node created - Type EXIST\n"); 
     }
-#line 1418 "parser.c"
+#line 1414 "parser.c"
     break;
 
   case 26: /* quant_or_atom: BRACKET_OPEN formula BRACKET_CLOSE  */
-#line 264 "parser.y"
+#line 260 "parser.y"
                                          { (yyval.p) = (yyvsp[-1].p); }
-#line 1424 "parser.c"
+#line 1420 "parser.c"
     break;
 
   case 27: /* atom: STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE  */
-#line 268 "parser.y"
+#line 264 "parser.y"
                                                     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[-3].str));
         if(entry == NULL) { 
@@ -1449,31 +1445,31 @@ yyreduce:
         fprintf(stderr, "SYT: Predicate Node created - %s\n", (yyvsp[-3].str));
         
     }
-#line 1453 "parser.c"
+#line 1449 "parser.c"
     break;
 
   case 28: /* term_list_opt: term_list  */
-#line 295 "parser.y"
+#line 291 "parser.y"
               { (yyval.p) = (yyvsp[0].p); }
-#line 1459 "parser.c"
+#line 1455 "parser.c"
     break;
 
   case 29: /* term_list_opt: %empty  */
-#line 296 "parser.y"
+#line 292 "parser.y"
       { (yyval.p) = NULL; }
-#line 1465 "parser.c"
+#line 1461 "parser.c"
     break;
 
   case 30: /* term_list: term  */
-#line 300 "parser.y"
+#line 296 "parser.y"
          { (yyval.p) = (yyvsp[0].p); 
     fprintf(stderr, "SYT: Argument Node created\n"); 
     }
-#line 1473 "parser.c"
+#line 1469 "parser.c"
     break;
 
   case 31: /* term_list: term_list COMMA term  */
-#line 303 "parser.y"
+#line 299 "parser.y"
                            {
         struct treeNode *last = (yyvsp[-2].p);
         while(last->next) last = last->next;
@@ -1481,11 +1477,11 @@ yyreduce:
         (yyval.p) = (yyvsp[-2].p); 
         fprintf(stderr, "SYT: Argument Node added to list\n");
     }
-#line 1485 "parser.c"
+#line 1481 "parser.c"
     break;
 
   case 32: /* term: STRING  */
-#line 313 "parser.y"
+#line 309 "parser.y"
            {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[0].str));
         if(entry == NULL) {
@@ -1514,22 +1510,22 @@ yyreduce:
             exit(1);
         }
     }
-#line 1518 "parser.c"
+#line 1514 "parser.c"
     break;
 
   case 33: /* term: INT  */
-#line 341 "parser.y"
+#line 337 "parser.y"
         {
         fprintf(stderr, "PAR: TERM: Number: %d\n", (yyvsp[0].val));
         (yyval.p) = makeNode(NODE_NUMBER);
         (yyval.p)->treeTypes.numberType.value = (yyvsp[0].val);
         fprintf(stderr, "SYT: Number Node created - %d\n", (yyvsp[0].val));
     }
-#line 1529 "parser.c"
+#line 1525 "parser.c"
     break;
 
   case 34: /* term: STRING BRACKET_OPEN term_list_opt BRACKET_CLOSE  */
-#line 347 "parser.y"
+#line 343 "parser.y"
                                                     {
         struct tableEntry *entry = getSymbolEntry(symbolTable, (yyvsp[-3].str));
         if(entry == NULL) { 
@@ -1553,11 +1549,11 @@ yyreduce:
         (yyval.p)->treeTypes.functionType.arguments = (yyvsp[-1].p);
         fprintf(stderr, "SYT: Function Node created - %s(...)\n", (yyvsp[-3].str));
     }
-#line 1557 "parser.c"
+#line 1553 "parser.c"
     break;
 
 
-#line 1561 "parser.c"
+#line 1557 "parser.c"
 
       default: break;
     }
@@ -1750,7 +1746,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 372 "parser.y"
+#line 368 "parser.y"
 
 
 void yyerror(const char *s) {

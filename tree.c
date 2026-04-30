@@ -13,29 +13,14 @@ struct treeNode *makeNode(int nodeType) {
     newNode->next = NULL;
 
     switch (nodeType) {
-        case NODE_QUANTOR: 
-            fprintf(stderr, "Creating node type %d\n", nodeType);
-            break;
-        case NODE_BINARY_OPERATOR: 
-            fprintf(stderr, "Creating node type %d\n", nodeType);
-            break;
-        case NODE_UNARY_OPERATOR: 
-            fprintf(stderr, "Creating node type %d\n", nodeType);
-            break;
-        case NODE_PREDICATE: 
-            fprintf(stderr, "Creating node type %d\n", nodeType);
-            break;
-        case NODE_FUNCTION   : 
-            fprintf(stderr, "Creating node type %d\n", nodeType);
-            break;
-        case NODE_VARIABLE: 
-            fprintf(stderr, "Creating node type %d\n", nodeType);
-            break;
-        case NODE_NUMBER: 
-            fprintf(stderr, "Creating node type %d\n", nodeType);
-            break;
-        case NODE_BOOL: 
-            fprintf(stderr, "Creating node type %d\n", nodeType);
+        case NODE_QUANTOR:
+        case NODE_BINARY_OPERATOR:
+        case NODE_UNARY_OPERATOR:
+        case NODE_PREDICATE:
+        case NODE_FUNCTION:
+        case NODE_VARIABLE:
+        case NODE_NUMBER:
+        case NODE_BOOL:
             break;
         default:
             fprintf(stderr, "Error: Invalid node type %d.\n", nodeType);
