@@ -10,6 +10,23 @@
 struct tableEntry *symbolTable = NULL;
 struct treeNode *ast = NULL;
 
+/* List of optimised formula trees, collected during parsing */
+struct formulaList {
+    struct treeNode *tree;
+    struct formulaList *next;
+};
+static struct formulaList *formula_head = NULL;
+static struct formulaList *formula_tail = NULL;
+
+static void add_formula(struct treeNode *tree) {
+    struct formulaList *entry = malloc(sizeof(struct formulaList));
+    entry->tree = tree;
+    entry->next = NULL;
+    if (formula_tail) formula_tail->next = entry;
+    else formula_head = entry;
+    formula_tail = entry;
+}
+
 int yylex(void);
 void yyerror(const char *s);
 extern FILE *yyin;
@@ -56,7 +73,6 @@ block:
         fprintf(stderr, "PAR: Formula completed with Semicolon.\n");
         
         fprintf(stderr, "\n----- New Block Parsed -----\n");
-        fprintf(stdout, "/* Created by PL1C */\n\n"); 
 
         fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
         printTree($2, 0);
@@ -72,12 +88,8 @@ block:
         fprintf(stderr, "----- End of Optimized Syntax Tree -----\n");
 
         printSymbolTable(symbolTable);
-        printDeclarationsFromSymbolTable(symbolTable);
-        fprintf(stdout, "\n");
-        printFormulaFromSyntaxTree(opt);
-        fprintf(stdout, " ;\n\n");
 
-        deleteTree(opt);
+        add_formula(opt);
         }
     ;
 
@@ -376,8 +388,22 @@ int main(int argc, char *argv[]){
     yyin = fp;
 
     int result = yyparse();
-    fclose(fp);
 
+    /* Print header, all declarations (once), then all formulas */
+    fprintf(stdout, "/* Created by PL1C */\n\n");
+    printDeclarationsFromSymbolTable(symbolTable);
+    fprintf(stdout, "\n");
+    struct formulaList *cur = formula_head;
+    while (cur != NULL) {
+        printFormulaFromSyntaxTree(cur->tree);
+        fprintf(stdout, " ;\n\n");
+        struct formulaList *tmp = cur;
+        cur = cur->next;
+        deleteTree(tmp->tree);
+        free(tmp);
+    }
+
+    fclose(fp);
     clearSymbolTable(&symbolTable);
 
     return result;
