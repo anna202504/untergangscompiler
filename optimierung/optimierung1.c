@@ -260,6 +260,173 @@ struct treeNode *push_negations_to_predicates(struct treeNode *node) {
     return result;
 }
 
+/* ------------------------------------------------------------------ */
+/* Public: evaluate boolean constants (constant folding)               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * evaluate_boolean_constants: simplifies subtrees that combine a boolean
+ * constant (TRUE / FALSE) with a logical operator.
+ *
+ * Rules applied (recursively, bottom-up):
+ *   NOT TRUE       => FALSE          NOT FALSE      => TRUE
+ *   FALSE & A      => FALSE          TRUE  & A      => A
+ *   A     & FALSE  => FALSE          A     & TRUE   => A
+ *   TRUE  | A      => TRUE           FALSE | A      => A
+ *   A     | TRUE   => TRUE           A     | FALSE  => A
+ *   FALSE -> A     => TRUE           TRUE  -> A     => A
+ *   A     -> TRUE  => TRUE           A     -> FALSE => ~A
+ *   TRUE  <-> A    => A              FALSE <-> A    => ~A
+ *   A     <-> TRUE => A              A     <-> FALSE => ~A
+ */
+struct treeNode *evaluate_boolean_constants(struct treeNode *node) {
+    if (node == NULL) return NULL;
+
+    switch (node->nodeType) {
+
+        case NODE_UNARY_OPERATOR:
+            node->treeTypes.unaryType.child =
+                evaluate_boolean_constants(node->treeTypes.unaryType.child);
+            if (node->treeTypes.unaryType.operatorType == UOP_NOT) {
+                struct treeNode *child = node->treeTypes.unaryType.child;
+                if (child != NULL && child->nodeType == NODE_BOOL) {
+                    int new_val = !child->treeTypes.boolType.value;
+                    fprintf(stderr, "OPT: BOOL: NOT %s => %s\n",
+                            child->treeTypes.boolType.value ? "TRUE" : "FALSE",
+                            new_val ? "TRUE" : "FALSE");
+                    node->treeTypes.unaryType.child = NULL;
+                    free(child);
+                    /* Repurpose this node as a BOOL node */
+                    node->nodeType = NODE_BOOL;
+                    node->treeTypes.boolType.value = new_val;
+                    return node;
+                }
+            }
+            break;
+
+        case NODE_BINARY_OPERATOR: {
+            node->treeTypes.binaryType.left =
+                evaluate_boolean_constants(node->treeTypes.binaryType.left);
+            node->treeTypes.binaryType.right =
+                evaluate_boolean_constants(node->treeTypes.binaryType.right);
+
+            struct treeNode *left  = node->treeTypes.binaryType.left;
+            struct treeNode *right = node->treeTypes.binaryType.right;
+            enum BinaryOperatorType op = node->treeTypes.binaryType.operatorType;
+
+            int left_bool  = (left  != NULL && left->nodeType  == NODE_BOOL);
+            int right_bool = (right != NULL && right->nodeType == NODE_BOOL);
+
+            if (!left_bool && !right_bool) break; /* nothing to fold */
+
+            /* Detach children and free the operator node before rewriting */
+            node->treeTypes.binaryType.left  = NULL;
+            node->treeTypes.binaryType.right = NULL;
+            free(node);
+
+            switch (op) {
+                case BINOP_AND:
+                    if (left_bool && !left->treeTypes.boolType.value) {
+                        fprintf(stderr, "OPT: BOOL: FALSE & A => FALSE\n");
+                        deleteTree(right);
+                        return left;
+                    }
+                    if (right_bool && !right->treeTypes.boolType.value) {
+                        fprintf(stderr, "OPT: BOOL: A & FALSE => FALSE\n");
+                        deleteTree(left);
+                        return right;
+                    }
+                    if (left_bool) { /* TRUE & A => A */
+                        fprintf(stderr, "OPT: BOOL: TRUE & A => A\n");
+                        free(left);
+                        return right;
+                    }
+                    /* A & TRUE => A */
+                    fprintf(stderr, "OPT: BOOL: A & TRUE => A\n");
+                    free(right);
+                    return left;
+
+                case BINOP_OR:
+                    if (left_bool && left->treeTypes.boolType.value) {
+                        fprintf(stderr, "OPT: BOOL: TRUE | A => TRUE\n");
+                        deleteTree(right);
+                        return left;
+                    }
+                    if (right_bool && right->treeTypes.boolType.value) {
+                        fprintf(stderr, "OPT: BOOL: A | TRUE => TRUE\n");
+                        deleteTree(left);
+                        return right;
+                    }
+                    if (left_bool) { /* FALSE | A => A */
+                        fprintf(stderr, "OPT: BOOL: FALSE | A => A\n");
+                        free(left);
+                        return right;
+                    }
+                    /* A | FALSE => A */
+                    fprintf(stderr, "OPT: BOOL: A | FALSE => A\n");
+                    free(right);
+                    return left;
+
+                case BINOP_IMPLIES:
+                    if (left_bool && !left->treeTypes.boolType.value) {
+                        fprintf(stderr, "OPT: BOOL: FALSE -> A => TRUE\n");
+                        deleteTree(right);
+                        left->treeTypes.boolType.value = 1;
+                        return left;
+                    }
+                    if (left_bool) { /* TRUE -> A => A */
+                        fprintf(stderr, "OPT: BOOL: TRUE -> A => A\n");
+                        free(left);
+                        return right;
+                    }
+                    if (right_bool && right->treeTypes.boolType.value) {
+                        fprintf(stderr, "OPT: BOOL: A -> TRUE => TRUE\n");
+                        deleteTree(left);
+                        return right;
+                    }
+                    /* A -> FALSE => ~A */
+                    fprintf(stderr, "OPT: BOOL: A -> FALSE => ~A\n");
+                    free(right);
+                    return make_not_node(left);
+
+                case BINOP_IFF:
+                    if (left_bool && left->treeTypes.boolType.value) {
+                        fprintf(stderr, "OPT: BOOL: TRUE <-> A => A\n");
+                        free(left);
+                        return right;
+                    }
+                    if (right_bool && right->treeTypes.boolType.value) {
+                        fprintf(stderr, "OPT: BOOL: A <-> TRUE => A\n");
+                        free(right);
+                        return left;
+                    }
+                    if (left_bool) { /* FALSE <-> A => ~A */
+                        fprintf(stderr, "OPT: BOOL: FALSE <-> A => ~A\n");
+                        free(left);
+                        return make_not_node(right);
+                    }
+                    /* A <-> FALSE => ~A */
+                    fprintf(stderr, "OPT: BOOL: A <-> FALSE => ~A\n");
+                    free(right);
+                    return make_not_node(left);
+            }
+            return NULL; /* unreachable for well-formed trees */
+        }
+
+        case NODE_QUANTOR:
+            node->treeTypes.quantorType.formula =
+                evaluate_boolean_constants(node->treeTypes.quantorType.formula);
+            break;
+
+        default:
+            break; /* leaf nodes — nothing to do */
+    }
+
+    return node;
+}
+
+/* ------------------------------------------------------------------ */
+
 struct treeNode *eliminate_double_negation(struct treeNode *node) {
     if (node == NULL) {
         return NULL;

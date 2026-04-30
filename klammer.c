@@ -66,11 +66,11 @@ static void printDeclarationRecursive(const struct tableEntry *entry) {
 	printDeclarationRecursive(entry->next);
 
 	if (strcmp(entry->type, "predicate") == 0) {
-		fprintf(stdout, "DECLARE PREDICATE %s : %d\n", entry->identifier, entry->arity);
+		fprintf(stdout, "DECLARE PREDICATE %-11s: %d\n", entry->identifier, entry->arity);
 	} else if (strcmp(entry->type, "function") == 0) {
-		fprintf(stdout, "DECLARE FUNCTION %s : %d\n", entry->identifier, entry->arity);
+		fprintf(stdout, "DECLARE FUNCTION  %-11s: %d\n", entry->identifier, entry->arity);
 	} else if (strcmp(entry->type, "variable") == 0) {
-		fprintf(stdout, "DECLARE VARIABLE %s : int\n", entry->identifier);
+		fprintf(stdout, "DECLARE VARIABLE  %-11s: int\n", entry->identifier);
 	}
 }
 
@@ -87,7 +87,11 @@ static void printFormulaNode(const struct treeNode *node, int parentPrecedence, 
 		if (nodePrecedence < parentPrecedence) {
 			needsParentheses = 1;
 		} else if (nodePrecedence == parentPrecedence && isRightChild && node->nodeType == NODE_BINARY_OPERATOR) {
-			needsParentheses = 1;
+			/* AND and OR are associative — right child of same precedence needs no parens */
+			enum BinaryOperatorType op = node->treeTypes.binaryType.operatorType;
+			if (op != BINOP_AND && op != BINOP_OR) {
+				needsParentheses = 1;
+			}
 		}
 	}
 
@@ -125,7 +129,7 @@ static void printFormulaNode(const struct treeNode *node, int parentPrecedence, 
 			printFormulaNode(node->treeTypes.binaryType.right, nodePrecedence, 1);
 			break;
 		case NODE_UNARY_OPERATOR:
-			fprintf(stdout, " ~ ");
+			fprintf(stdout, "~");
 			printFormulaNode(node->treeTypes.unaryType.child, PREC_NOT, 1);
 			break;
 		case NODE_PREDICATE:

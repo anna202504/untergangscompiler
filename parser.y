@@ -55,7 +55,8 @@ block:
     declarations formula SEMICOLON { 
         fprintf(stderr, "PAR: Formula completed with Semicolon.\n");
         
-        fprintf(stderr, "\n----- New Block Parsed -----\n"); 
+        fprintf(stderr, "\n----- New Block Parsed -----\n");
+        fprintf(stdout, "/* Created by PL1C */\n\n"); 
 
         fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
         printTree($2, 0);
@@ -64,6 +65,7 @@ block:
         struct treeNode *opt = eliminate_double_negation($2);
         opt = eliminate_implications_and_equivalences(opt);
         opt = push_negations_to_predicates(opt);
+        opt = evaluate_boolean_constants(opt);
 
         fprintf(stderr, "\n----- Optimized Syntax Tree -----\n");
         printTree(opt, 0);
@@ -73,7 +75,7 @@ block:
         printDeclarationsFromSymbolTable(symbolTable);
         fprintf(stdout, "\n");
         printFormulaFromSyntaxTree(opt);
-        fprintf(stdout, ";\n");
+        fprintf(stdout, " ;\n\n");
 
         deleteTree(opt);
         }

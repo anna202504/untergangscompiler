@@ -35,4 +35,21 @@ struct treeNode *eliminate_double_negation(struct treeNode *node);
  */
 struct treeNode *push_negations_to_predicates(struct treeNode *node);
 
+/*
+ * Evaluates boolean constants by simplifying operations that involve
+ * TRUE or FALSE. Recurses into all children (bottom-up).
+ * Rules applied:
+ *   NOT TRUE       => FALSE          NOT FALSE      => TRUE
+ *   FALSE & A      => FALSE          TRUE  & A      => A
+ *   A     & FALSE  => FALSE          A     & TRUE   => A
+ *   TRUE  | A      => TRUE           FALSE | A      => A
+ *   A     | TRUE   => TRUE           A     | FALSE  => A
+ *   FALSE -> A     => TRUE           TRUE  -> A     => A
+ *   A     -> TRUE  => TRUE           A     -> FALSE => ~A
+ *   TRUE  <-> A    => A              FALSE <-> A    => ~A
+ *   A     <-> TRUE => A              A     <-> FALSE => ~A
+ * Returns the new root of the simplified tree.
+ */
+struct treeNode *evaluate_boolean_constants(struct treeNode *node);
+
 #endif /* OPTIMIERUNG_H */
