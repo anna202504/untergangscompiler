@@ -1,6 +1,8 @@
+# PL/1 Formula Compiler
+
 ## What the Compiler Does
 
-For each input block, the compiler:
+The compiler can read one or more declaration/formula blocks from the same input file. For each block, it:
 
 1. tokenizes the input with Flex (`scanner.l`);
 2. parses declarations and formulas with Bison (`parser.y`);
@@ -8,7 +10,8 @@ For each input block, the compiler:
 4. builds an abstract syntax tree;
 5. validates identifier usage and argument arity;
 6. rewrites the formula with logical simplifications;
-7. prints declarations and the optimized formula to `stdout`.
+7. stores the optimized formula in a linked list;
+8. prints the combined declarations and all optimized formulas to `stdout` after the complete file has been parsed.
 
 Debug information from the scanner, parser, symbol table, syntax tree, and optimizer is printed to `stderr`.
 
@@ -22,6 +25,7 @@ Debug information from the scanner, parser, symbol table, syntax tree, and optim
 | `tree.c/.h` | Syntax tree node definitions, creation, copying, deletion, argument counting, and debug tree printing. |
 | `optimierung1.c/.h` | Formula optimization passes. |
 | `klammer.c/.h` | Pretty-printer for declarations and formulas, including parentheses handling. |
+| `multiple.c/.h` | Linked-list helper for storing, printing, and deleting multiple parsed formulas. |
 | `Input_folder/` | Example input files. |
 | `reference_output_folder/` | Expected/reference outputs for the example inputs. |
 | `Makefile` | Build rules for generating and compiling `pl1c`. |
@@ -77,7 +81,7 @@ Run the compiler with one input file:
 ./pl1c Input_folder/complex_in.pl1
 ```
 
-The optimized PL/1-like formula is printed to `stdout`. To save it to a file:
+The optimized PL/1-like output is printed to `stdout`. If the input contains multiple blocks, all optimized formulas are printed in the same output file. To save the result:
 
 ```sh
 ./pl1c Input_folder/complex_in.pl1 > out.pl1
@@ -97,7 +101,7 @@ To save both output and debug logs separately:
 
 ## Input Language
 
-An input file contains declarations followed by a formula ending with `;`.
+An input file contains one or more blocks. Each block contains declarations followed by one formula ending with `;`.
 
 Example:
 
@@ -107,6 +111,21 @@ DECLARE PREDICATE B : 0
 
 A() -> B() ;
 ```
+
+Multiple blocks can be placed after each other in the same file:
+
+```pl1
+DECLARE PREDICATE A : 0
+DECLARE PREDICATE B : 0
+
+A() -> B() ;
+
+DECLARE PREDICATE C : 0
+
+B() <-> C() ;
+```
+
+The symbol table is shared across the whole input file. That means declarations from earlier blocks are still known in later blocks. Re-declaring the same identifier is allowed only if the declaration matches the previous type and arity.
 
 Supported declarations:
 
@@ -179,6 +198,22 @@ DECLARE PREDICATE B : 0
 
 ~ A() | B() ;
 ```
+
+## Multiple Formulas
+
+The `multiple.c/.h` module stores optimized formulas in a `formulaList` linked list while parsing continues. This is used by inputs such as:
+
+```sh
+./pl1c Input_folder/multiple_in.pl1 > out.pl1 2>/dev/null
+```
+
+`Input_folder/multiple_in.pl1` contains two separate tasks. The compiler parses both, merges their declarations into one symbol table, optimizes both formulas, and then prints:
+
+1. all declarations found in the file;
+2. a blank line;
+3. each optimized formula followed by `;`.
+
+This makes it possible to process several formulas in one compiler run instead of starting `pl1c` separately for every formula.
 
 ## Troubleshooting
 
