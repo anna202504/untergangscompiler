@@ -10,6 +10,46 @@
 struct tableEntry *symbolTable = NULL;
 struct treeNode *ast = NULL;
 
+struct formulaList {
+    struct treeNode *formula;
+    struct formulaList *next;
+};
+
+struct formulaList *formulasHead = NULL;
+struct formulaList *formulasTail = NULL;
+
+void addFormula(struct treeNode *f) {
+    struct formulaList *n = malloc(sizeof(struct formulaList));
+    n->formula = f;
+    n->next = NULL;
+
+    if (formulasHead == NULL) {
+        formulasHead = formulasTail = n;
+    } else {
+        formulasTail->next = n;
+        formulasTail = n;
+    }
+}
+
+void printAllFormulas(void) {
+    struct formulaList *cur = formulasHead;
+    while (cur != NULL) {
+        printFormula(cur->formula);
+        fprintf(stdout, " ;\n\n");
+        cur = cur->next;
+    }
+}
+
+void deleteAllFormulas(void) {
+    struct formulaList *cur = formulasHead;
+    while (cur != NULL) {
+        struct formulaList *tmp = cur;
+        cur = cur->next;
+        deleteTree(tmp->formula);
+        free(tmp);
+    }
+}
+
 int yylex(void);
 void yyerror(const char *s);
 extern FILE *yyin;
@@ -71,14 +111,7 @@ block:
         printSymbolTable(symbolTable);
 
         fprintf(stderr, "\n----- Declaration & Formula ------\n");
-        printDeclaration(symbolTable);
-        fprintf(stdout, "\n");
-        printFormula(opt);
-        fprintf(stdout, " ;\n");
-        fflush(stdout);
-        fprintf(stderr, "\n----- END ------\n");
-
-        deleteTree(opt);
+        addFormula(opt);
         }
     ;
 
@@ -379,6 +412,11 @@ int main(int argc, char *argv[]){
     int result = yyparse();
     fclose(fp);
 
+    printDeclaration(symbolTable);
+    fprintf(stdout, "\n");
+    printAllFormulas();
+
+    deleteAllFormulas();
     clearSymbolTable(&symbolTable);
 
     return result;

@@ -10,7 +10,7 @@
 
 
 Wichtig: Bei den ersten beiden Schritten wird auf die flex-Datei zugegriffen. Beim 4. Schritt muss eine input-Datei in PL1
-eingegeben werden. 
+eingegeben werden.
 
 Datei von Output erstellen:
 
