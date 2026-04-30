@@ -1,9 +1,3 @@
-# PL/1 Formula Compiler
-
-This project is a small compiler/rewriter for a PL/1-inspired first-order logic input language. It reads declarations and formulas from a `.pl1` file, builds a syntax tree, performs simple logical optimizations, and prints the transformed formula again.
-
-The executable is called `pl1c`.
-
 ## What the Compiler Does
 
 For each input block, the compiler:
