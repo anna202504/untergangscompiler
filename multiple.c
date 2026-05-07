@@ -21,7 +21,10 @@ void printAllFormulas(struct formulaList *head) {
     struct formulaList *cur = head;
     while (cur != NULL) {
         printFormula(cur->formula);
-        fprintf(stdout, " ;\n\n");
+        fprintf(stdout, " ;\n");
+        if (cur->next != NULL) {
+            fprintf(stdout, "\n");
+        }
         cur = cur->next;
     }
 }

@@ -238,6 +238,7 @@ struct treeNode *replaceImplicationsAndEquivalences(struct treeNode *root) {
                 root->treeTypes.binaryType.left = notLeft;
                 root->treeTypes.binaryType.right = right;
 
+                fprintf(stderr, "Reusing binary node, changing IMPLIES to OR\n");
                 return root;
             }
 
@@ -269,6 +270,7 @@ struct treeNode *replaceImplicationsAndEquivalences(struct treeNode *root) {
                 root->treeTypes.binaryType.left = and1;
                 root->treeTypes.binaryType.right = and2;
 
+                fprintf(stderr, "Reusing binary node, changing IFF to OR and reusing left/right in first AND subtree\n");
                 return root;
             }
 

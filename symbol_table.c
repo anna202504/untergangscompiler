@@ -27,7 +27,7 @@ struct tableEntry *getSymbolEntry(struct tableEntry *head, char *identifier) {
 void printSymbolTable(struct tableEntry *head) {
     struct tableEntry *current = head;
 
-    fprintf(stderr, "\n--- Symbol Table ---\n");
+    fprintf(stderr, "\n----- Start of Symbol Table -----\n");
 
     while (current != NULL) {
         fprintf(stderr, "Identifier: %s | Type: %s | Arity: %d\n",
@@ -37,7 +37,7 @@ void printSymbolTable(struct tableEntry *head) {
         current = current->next;
     }
 
-    fprintf(stderr, "---------------------\n");
+    fprintf(stderr, "----- End of Symbol Table -----\n");
 }
 
 void clearSymbolTable(struct tableEntry **head) {

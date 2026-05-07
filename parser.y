@@ -14,10 +14,13 @@ struct treeNode *ast = NULL;
 struct formulaList *formulasHead = NULL;
 struct formulaList *formulasTail = NULL;
 int pendingBlockFooter = 0;
+int inputBlockParsingOpen = 0;
 
 int yylex(void);
 void yyerror(const char *s);
 void printPendingBlockFooter(int hasNextBlock);
+void startInputBlockParsing(void);
+void endInputBlockParsing(void);
 extern FILE *yyin;
 %}
 
@@ -59,18 +62,20 @@ input:
 
 block:
     declarations formula SEMICOLON { 
-        fprintf(stderr, "\n ----- Optimisation ----- \n");
+        fprintf(stderr, "PAR: Formula completed with Semicolon.\n");
+        endInputBlockParsing();
+
+        fprintf(stderr, "\n----- Start of Optimisation -----\n");
         struct treeNode *opt = replaceImplicationsAndEquivalences($2);
         opt = eliminateDoubleNegations(opt);
         opt = moveNegations(opt);
         opt = evaluateBooleanOperations(opt);
-        opt = eliminateDoubleNegations(opt);       
+        opt = eliminateDoubleNegations(opt);  
+        fprintf(stderr, "----- End of Optimisation -----\n");     
 
-        fprintf(stderr, "PAR: Formula completed with Semicolon.\n");
-
-        fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
+        fprintf(stderr, "\n----- Start of Syntax Tree Printout -----\n");
         printTree(opt, 0);
-        fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
+        fprintf(stderr, "----- End of Syntax Tree Printout -----\n");
 
         printSymbolTable(symbolTable);
 
@@ -371,8 +376,25 @@ void printPendingBlockFooter(int hasNextBlock) {
         fprintf(stderr, "\n----- New Block Parsed -----\n");
     }
 
-    fprintf(stderr, "\n----- Declaration & Formula ------\n");
     pendingBlockFooter = 0;
+}
+
+void startInputBlockParsing(void) {
+    if (inputBlockParsingOpen) {
+        return;
+    }
+
+    fprintf(stderr, "\n----- Start of Input Block Parsing -----\n");
+    inputBlockParsingOpen = 1;
+}
+
+void endInputBlockParsing(void) {
+    if (!inputBlockParsingOpen) {
+        return;
+    }
+
+    fprintf(stderr, "----- End of Input Block Parsing -----\n");
+    inputBlockParsingOpen = 0;
 }
 
 int main(int argc, char *argv[]){
@@ -390,9 +412,12 @@ int main(int argc, char *argv[]){
     int result = yyparse();
     fclose(fp);
 
+    fprintf(stderr, "\n----- Start of Declaration & Formula -----\n");
     printDeclaration(symbolTable);
     fprintf(stdout, "\n");
     printAllFormulas(formulasHead);
+    fflush(stdout);
+    fprintf(stderr, "----- End of Declaration & Formula -----\n\n");
 
     deleteAllFormulas(&formulasHead, &formulasTail);
     clearSymbolTable(&symbolTable);

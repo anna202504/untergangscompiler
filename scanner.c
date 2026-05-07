@@ -498,8 +498,9 @@ char *yytext;
     #include <stdlib.h>
     #include "parser.h"
     void printPendingBlockFooter(int hasNextBlock);
-#line 501 "<stdout>"
+    void startInputBlockParsing(void);
 #line 502 "<stdout>"
+#line 503 "<stdout>"
 
 #define INITIAL 0
 
@@ -716,10 +717,10 @@ YY_DECL
 		}
 
 	{
-#line 12 "scanner.l"
+#line 13 "scanner.l"
 
 
-#line 722 "<stdout>"
+#line 723 "<stdout>"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -779,136 +780,136 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 14 "scanner.l"
+#line 15 "scanner.l"
 { /* ignore comment */ }  
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 15 "scanner.l"
+#line 16 "scanner.l"
 ; 
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 17 "scanner.l"
-{printPendingBlockFooter(1); fprintf(stderr, "LEX: KEY: DECLARE\n"); return DECLARE;}
+#line 18 "scanner.l"
+{printPendingBlockFooter(1); startInputBlockParsing(); fprintf(stderr, "LEX: KEY: DECLARE\n"); return DECLARE;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 18 "scanner.l"
+#line 19 "scanner.l"
 {fprintf(stderr, "LEX: KEY: PREDICATE\n"); return PREDICATE;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 19 "scanner.l"
+#line 20 "scanner.l"
 {fprintf(stderr, "LEX: KEY: FUNCTION\n"); return FUNCTION;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 20 "scanner.l"
+#line 21 "scanner.l"
 {fprintf(stderr, "LEX: KEY: VARIABLE\n"); return VARIABLE;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 22 "scanner.l"
+#line 23 "scanner.l"
 {fprintf(stderr, "LEX: KEY: EXIST\n"); return EXIST;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 23 "scanner.l"
+#line 24 "scanner.l"
 {fprintf(stderr, "LEX: KEY: ALL\n"); return ALL;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 25 "scanner.l"
+#line 26 "scanner.l"
 {fprintf(stderr, "LEX: CONST: TRUE\n"); return TRUE;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 26 "scanner.l"
+#line 27 "scanner.l"
 {fprintf(stderr, "LEX: CONST: FALSE\n"); return FALSE;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 28 "scanner.l"
+#line 29 "scanner.l"
 { fprintf(stderr, "LEX: OPERATOR: EQUIV\n"); return EQUIV;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 29 "scanner.l"
+#line 30 "scanner.l"
 { fprintf(stderr, "LEX: OPERATOR: IMPLIES\n"); return IMPLIES;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 30 "scanner.l"
+#line 31 "scanner.l"
 { fprintf(stderr, "LEX: OPERATOR: AND\n"); return AND;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 31 "scanner.l"
+#line 32 "scanner.l"
 { fprintf(stderr, "LEX: OPERATOR: OR\n"); return OR;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 32 "scanner.l"
+#line 33 "scanner.l"
 { fprintf(stderr, "LEX: OPERATOR: NOT\n"); return NOT;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 34 "scanner.l"
+#line 35 "scanner.l"
 {fprintf(stderr, "LEX: KEY: Bracket Open\n"); return BRACKET_OPEN; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 35 "scanner.l"
+#line 36 "scanner.l"
 {fprintf(stderr, "LEX: KEY: Bracket Close\n"); return BRACKET_CLOSE;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 36 "scanner.l"
+#line 37 "scanner.l"
 {fprintf(stderr, "LEX: KEY: Square bracket Open\n"); return SQUARE_BRACKET_OPEN;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 37 "scanner.l"
+#line 38 "scanner.l"
 {fprintf(stderr, "LEX: KEY: Square bracket Close\n"); return SQUARE_BRACKET_CLOSE;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 39 "scanner.l"
+#line 40 "scanner.l"
 {fprintf(stderr, "LEX: KEY: Comma\n"); return COMMA;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 40 "scanner.l"
+#line 41 "scanner.l"
 {fprintf(stderr, "LEX: KEY: Colon\n"); return COLON;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 41 "scanner.l"
+#line 42 "scanner.l"
 {fprintf(stderr, "LEX: KEY: Semicolon\n"); return SEMICOLON;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 43 "scanner.l"
+#line 44 "scanner.l"
 { yylval.val = atoi(yytext); fprintf(stderr, "LEX: INT: %d\n", yylval.val); return INT;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 44 "scanner.l"
+#line 45 "scanner.l"
 {fprintf(stderr, "LEX: STRING: %s\n", yytext); yylval.str = strdup(yytext); return STRING;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 47 "scanner.l"
+#line 48 "scanner.l"
 {fprintf(stderr, "LEX ERROR: %s\n",yytext);}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 49 "scanner.l"
+#line 50 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 911 "<stdout>"
+#line 912 "<stdout>"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1913,7 +1914,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 49 "scanner.l"
+#line 50 "scanner.l"
 
  
 int yywrap(){
