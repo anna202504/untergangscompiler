@@ -25,7 +25,7 @@ struct treeNode *makeNode(int nodeType) {
         case NODE_PREDICATE: 
             fprintf(stderr, "Creating node type %d\n", nodeType);
             break;
-        case NODE_FUNCTION   : 
+        case NODE_FUNCTION: 
             fprintf(stderr, "Creating node type %d\n", nodeType);
             break;
         case NODE_VARIABLE: 

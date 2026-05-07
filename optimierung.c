@@ -1,7 +1,7 @@
 #include "klammer.h"
 #include "symbol_table.h"
 #include "tree.h"
-#include "optimierung1.h"
+#include "optimierung.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -109,6 +109,8 @@ struct treeNode *moveNegations(struct treeNode *root) {
                     rightNot->treeTypes.unaryType.operatorType = UOP_NOT;
                     rightNot->treeTypes.unaryType.child = child->treeTypes.binaryType.right;
 
+                    fprintf(stderr, "Reusing binary node, changing & to |\n");
+
                     child->treeTypes.binaryType.operatorType = BINOP_OR;
                     child->treeTypes.binaryType.left = moveNegations(leftNot);
                     child->treeTypes.binaryType.right = moveNegations(rightNot);
@@ -130,6 +132,8 @@ struct treeNode *moveNegations(struct treeNode *root) {
                     rightNot->treeTypes.unaryType.operatorType = UOP_NOT;
                     rightNot->treeTypes.unaryType.child = child->treeTypes.binaryType.right;
 
+                    fprintf(stderr, "Reusing binary node, changing | to &\n");
+
                     child->treeTypes.binaryType.operatorType = BINOP_AND;
                     child->treeTypes.binaryType.left = moveNegations(leftNot);
                     child->treeTypes.binaryType.right = moveNegations(rightNot);
@@ -147,6 +151,8 @@ struct treeNode *moveNegations(struct treeNode *root) {
                     newNot->treeTypes.unaryType.operatorType = UOP_NOT;
                     newNot->treeTypes.unaryType.child = child->treeTypes.quantorType.formula;
 
+                    fprintf(stderr, "Reusing quantor node, changing FORALL to EXISTS\n");
+
                     child->treeTypes.quantorType.quantorType = EXISTS;
                     child->treeTypes.quantorType.formula = moveNegations(newNot);
 
@@ -162,6 +168,8 @@ struct treeNode *moveNegations(struct treeNode *root) {
                     struct treeNode *newNot = makeNode(NODE_UNARY_OPERATOR);
                     newNot->treeTypes.unaryType.operatorType = UOP_NOT;
                     newNot->treeTypes.unaryType.child = child->treeTypes.quantorType.formula;
+
+                    fprintf(stderr, "Reusing quantor node, changing EXISTS to FORALL\n");
 
                     child->treeTypes.quantorType.quantorType = FORALL;
                     child->treeTypes.quantorType.formula = moveNegations(newNot);

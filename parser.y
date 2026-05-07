@@ -5,7 +5,7 @@
 #include "symbol_table.h"
 #include "tree.h"
 #include "klammer.h"
-#include "optimierung1.h"
+#include "optimierung.h"
 #include "multiple.h"
 
 struct tableEntry *symbolTable = NULL;
@@ -13,9 +13,11 @@ struct treeNode *ast = NULL;
 
 struct formulaList *formulasHead = NULL;
 struct formulaList *formulasTail = NULL;
+int pendingBlockFooter = 0;
 
 int yylex(void);
 void yyerror(const char *s);
+void printPendingBlockFooter(int hasNextBlock);
 extern FILE *yyin;
 %}
 
@@ -57,6 +59,7 @@ input:
 
 block:
     declarations formula SEMICOLON { 
+        fprintf(stderr, "\n ----- Optimisation ----- \n");
         struct treeNode *opt = replaceImplicationsAndEquivalences($2);
         opt = eliminateDoubleNegations(opt);
         opt = moveNegations(opt);
@@ -65,17 +68,15 @@ block:
 
         fprintf(stderr, "PAR: Formula completed with Semicolon.\n");
 
-        fprintf(stderr, "\n----- New Block Parsed -----\n"); 
-
         fprintf(stderr, "\n----- Start Syntax Tree Printout. -----\n");
-        fprintf(stderr, "\n");
         printTree(opt, 0);
         fprintf(stderr, "----- End of Syntax Tree Printout. -----\n");
 
         printSymbolTable(symbolTable);
 
-        fprintf(stderr, "\n----- Declaration & Formula ------\n");
         addFormula(&formulasHead, &formulasTail, opt);
+
+        pendingBlockFooter = 1;
         }
     ;
 
@@ -359,6 +360,19 @@ term:
 
 void yyerror(const char *s) {
     fprintf(stderr,"Parser error: %s\n", s);
+}
+
+void printPendingBlockFooter(int hasNextBlock) {
+    if (!pendingBlockFooter) {
+        return;
+    }
+
+    if (hasNextBlock) {
+        fprintf(stderr, "\n----- New Block Parsed -----\n");
+    }
+
+    fprintf(stderr, "\n----- Declaration & Formula ------\n");
+    pendingBlockFooter = 0;
 }
 
 int main(int argc, char *argv[]){

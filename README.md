@@ -23,7 +23,7 @@ Debug information from the scanner, parser, symbol table, syntax tree, and optim
 | `parser.y` | Bison grammar and main program. Parses declarations/formulas, performs semantic checks, calls optimizer passes, and prints output. |
 | `symbol_table.c/.h` | Linked-list symbol table for predicates, functions, and variables. |
 | `tree.c/.h` | Syntax tree node definitions, creation, copying, deletion, argument counting, and debug tree printing. |
-| `optimierung1.c/.h` | Formula optimization passes. |
+| `optimierung.c/.h` | Formula optimization passes. |
 | `klammer.c/.h` | Pretty-printer for declarations and formulas, including parentheses handling. |
 | `multiple.c/.h` | Linked-list helper for storing, printing, and deleting multiple parsed formulas. |
 | `Input_folder/` | Example input files. |

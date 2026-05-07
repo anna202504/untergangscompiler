@@ -3,6 +3,7 @@
     #include <string.h>
     #include <stdlib.h>
     #include "parser.h"
+    void printPendingBlockFooter(int hasNextBlock);
 %}
 
 DIGIT [0-9]
@@ -13,7 +14,7 @@ ID [a-zA-Z][a-zA-Z0-9]*
 "/*"([^*]|\*+[^*/])*\*+"/"  { /* ignore comment */ }  
 [ \t\r\n]+ ; 
 
-"DECLARE" {fprintf(stderr, "LEX: KEY: DECLARE\n"); return DECLARE;}
+"DECLARE" {printPendingBlockFooter(1); fprintf(stderr, "LEX: KEY: DECLARE\n"); return DECLARE;}
 "PREDICATE" {fprintf(stderr, "LEX: KEY: PREDICATE\n"); return PREDICATE;}
 "FUNCTION" {fprintf(stderr, "LEX: KEY: FUNCTION\n"); return FUNCTION;}
 "VARIABLE" {fprintf(stderr, "LEX: KEY: VARIABLE\n"); return VARIABLE;}
@@ -48,6 +49,6 @@ ID [a-zA-Z][a-zA-Z0-9]*
 %%
  
 int yywrap(){
+    printPendingBlockFooter(0);
     return 1;
 }
-
