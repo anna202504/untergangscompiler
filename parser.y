@@ -373,7 +373,7 @@ void printPendingBlockFooter(int hasNextBlock) {
     }
 
     if (hasNextBlock) {
-        fprintf(stderr, "\n----- New Block Parsed -----\n");
+        fprintf(stderr, "\n----- New Block -----\n");
     }
 
     pendingBlockFooter = 0;
